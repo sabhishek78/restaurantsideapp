@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:restaurantsideapp/accepted_orders.dart';
+import 'package:restaurantsideapp/all_orders.dart';
+import 'package:restaurantsideapp/all_orders_owner.dart';
 import 'package:restaurantsideapp/delivered_orders.dart';
 import 'package:restaurantsideapp/menu.dart';
 import 'package:restaurantsideapp/out_for_delivery.dart';
@@ -144,7 +146,7 @@ class _MainScreenState extends State<MainScreen> {
                 },
               ),
             ),
-            if(workStatus=="manager")
+            if(workStatus=="manager" || workStatus=="owner")
               Container(
                 padding: EdgeInsets.fromLTRB(5,5,10,5),
                 width: 150.0,
@@ -162,6 +164,54 @@ class _MainScreenState extends State<MainScreen> {
                       MaterialPageRoute(
                         builder: (BuildContext context){
                           return MenuScreen();
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            if(workStatus=="manager")
+              Container(
+                padding: EdgeInsets.fromLTRB(5,5,10,5),
+                width: 150.0,
+                height: 50.0,
+                child: FlatButton(
+                  color: Colors.red,
+                  child: Text(
+                    "View Order History".toUpperCase(),
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  onPressed: (){
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (BuildContext context){
+                          return AllOrdersScreen();
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            if(workStatus=="owner")
+              Container(
+                padding: EdgeInsets.fromLTRB(5,5,10,5),
+                width: 150.0,
+                height: 50.0,
+                child: FlatButton(
+                  color: Colors.red,
+                  child: Text(
+                    "View Order History".toUpperCase(),
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  onPressed: (){
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (BuildContext context){
+                          return AllOrdersOwnerScreen();
                         },
                       ),
                     );

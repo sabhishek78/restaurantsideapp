@@ -49,7 +49,6 @@ class _AllOrdersOwnerScreenState extends State<AllOrdersOwnerScreen> {
       restaurants.add(temp);
     }
     print(restaurants);
-
     for(int i=0;i<restaurants.length;i++){
       restaurantMap[restaurants[i]["id"]]=restaurants[i]["name"];
     }
@@ -108,6 +107,8 @@ class _AllOrdersOwnerScreenState extends State<AllOrdersOwnerScreen> {
                 ),
                 child: Column(
                   children: <Widget>[
+                    Text("Restaurant Name:"+restaurantMap[orders[index]["restaurantId"]],
+                        style: TextStyle(color: Colors.black)),
                     Column(
                       children: List.generate(orders[index]["order"].length, (i) {
                         return Container(
@@ -138,8 +139,7 @@ class _AllOrdersOwnerScreenState extends State<AllOrdersOwnerScreen> {
                         style: TextStyle(color: Colors.black)),
                     Text("Status:"+orders[index]["status"],
                         style: TextStyle(color: Colors.black)),
-                    Text("Restaurant Name:"+restaurantMap[orders[index]["restaurantId"]],
-                        style: TextStyle(color: Colors.black)),
+
                   ],
                 ),
               ));

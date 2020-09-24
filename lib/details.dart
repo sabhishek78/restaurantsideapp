@@ -1,4 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:restaurantsideapp/menu.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io';
 
 
 class ProductDetails extends StatefulWidget {
@@ -9,9 +14,107 @@ class ProductDetails extends StatefulWidget {
 }
 
 class _ProductDetailsState extends State<ProductDetails> {
-  // PageController _pageController;
-  // int _page = 0;
-  // bool isFav = false;
+  File _image;
+  final FirebaseStorage _storage =
+  FirebaseStorage(storageBucket: 'gs://restaurantapp-65d0e.appspot.com');
+  StorageUploadTask _uploadTask;
+
+  deleteItemFromDatabase()async{
+    DocumentReference documentReference = FirebaseFirestore.instance.collection('menu').doc(widget.foodItem["name"]);
+    await documentReference.delete();
+    print("item deleted from database");
+  }
+  uploadPhotoToFirebase()async{
+    print("Uploading image to Firebase");
+    String fileName =  widget.foodItem['name'];
+    fileName = fileName.trim();
+    _uploadTask = _storage.ref().child(fileName).putFile(_image);
+    String docUrl = await (await _uploadTask.onComplete).ref.getDownloadURL();
+    var menuRef = FirebaseFirestore.instance.collection("menu");
+    var query = await menuRef.where("name", isEqualTo: widget.foodItem['name']).get();
+    var docSnapShotList = query.docs;
+     var docName=docSnapShotList[0].id;
+     print("Document Name="+docName);
+     await menuRef.doc(docName).update({"image":docUrl});
+    setState(() {
+
+    });
+    print("Uploaded image to firebase");
+  }
+  _imgFromCamera() async {
+    File image = await ImagePicker.pickImage(
+        source: ImageSource.camera, imageQuality: 50
+    );
+
+    setState(() {
+      _image = image;
+    });
+  }
+
+  _imgFromGallery() async {
+    File image = await  ImagePicker.pickImage(
+        source: ImageSource.gallery, imageQuality: 50
+    );
+
+    setState(() {
+      _image = image;
+    });
+  }
+  void _showPicker(context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return SafeArea(
+            child: Container(
+              child: new Wrap(
+                children: <Widget>[
+                  new ListTile(
+                      leading: new Icon(Icons.photo_library),
+                      title: new Text('Photo Library'),
+                      onTap: () async{
+                       await _imgFromGallery();
+                       await uploadPhotoToFirebase();
+                       Navigator.of(context).push(
+                         MaterialPageRoute(
+                           builder: (BuildContext context){
+                             return MenuScreen();
+                           },
+                         ),
+                       );
+                      }),
+                  new ListTile(
+                    leading: new Icon(Icons.photo_camera),
+                    title: new Text('Camera'),
+                    onTap: () async{
+                     await _imgFromCamera();
+                     await uploadPhotoToFirebase();
+                     Navigator.of(context).push(
+                       MaterialPageRoute(
+                         builder: (BuildContext context){
+                           return MenuScreen();
+                         },
+                       ),
+                     );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+    );
+  }
+  // getFoodItemDetails()async{
+  //   var menuRef = FirebaseFirestore.instance.collection("menu");
+  //   var query = await menuRef.where("name", isEqualTo: widget.foodItem['name']).get();
+  //   var docSnapShotList = query.docs;
+  //   item=docSnapShotList[0].data()
+  //   print("Dish Description Updated");
+  // }
+  // void initState() {
+  //   super.initState();
+  //   getFoodItemDetails();
+  // }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,39 +153,54 @@ class _ProductDetailsState extends State<ProductDetails> {
                     ),
                   ),
                 ),
-
-                // Positioned(
-                //   right: -10.0,
-                //   bottom: 3.0,
-                //   child: RawMaterialButton(
-                //     onPressed: (){},
-                //     fillColor: Colors.white,
-                //     shape: CircleBorder(),
-                //     elevation: 4.0,
-                //     child: Padding(
-                //       padding: EdgeInsets.all(5),
-                //       child: Icon(
-                //         isFav
-                //             ?Icons.favorite
-                //             :Icons.favorite_border,
-                //         color: Colors.red,
-                //         size: 17,
-                //       ),
-                //     ),
-                //   ),
-                // ),
+                Positioned(
+                  right: -10.0,
+                  bottom: 3.0,
+                  child: RawMaterialButton(
+                    onPressed: (){
+                      _showPicker(context);
+                    },
+                    fillColor: Colors.white,
+                    shape: CircleBorder(),
+                    elevation: 4.0,
+                    child: Padding(
+                      padding: EdgeInsets.all(5),
+                      child: Icon(Icons.update,
+                        color: Colors.red,
+                        size: 17,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
 
             SizedBox(height: 10.0),
 
-            Text(
-              widget.foodItem["name"],
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-              ),
-              maxLines: 2,
+            Row(
+              children: <Widget>[
+                Text(
+                  widget.foodItem["name"],
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                  ),
+                  maxLines: 2,
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.edit,
+                    size: 20.0,
+                  ),
+                  onPressed: ()async {
+                    await alertDialogEditDishName(context);
+                    setState(() {
+
+                    });
+                  },
+                  tooltip: "Edit",
+                )
+              ],
             ),
             Padding(
               padding: EdgeInsets.only(bottom: 5.0, top: 2.0),
@@ -96,6 +214,19 @@ class _ProductDetailsState extends State<ProductDetails> {
                       color: Theme.of(context).accentColor,
                     ),
                   ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.edit,
+                      size: 20.0,
+                    ),
+                    onPressed: ()async {
+                      await alertDialogEditDishPrice(context);
+                      setState(() {
+
+                      });
+                    },
+                    tooltip: "Edit",
+                  )
 
                 ],
               ),
@@ -104,13 +235,30 @@ class _ProductDetailsState extends State<ProductDetails> {
 
             SizedBox(height: 20.0),
 
-            Text(
-              "Product Description",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-              ),
-              maxLines: 2,
+            Row(
+              children: <Widget>[
+                Text(
+                  "Product Description",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                  ),
+                  maxLines: 2,
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.edit,
+                    size: 20.0,
+                  ),
+                  onPressed: ()async {
+                    await alertDialogEditDishDescription(context);
+                    setState(() {
+
+                    });
+                  },
+                  tooltip: "Edit",
+                )
+              ],
             ),
 
             SizedBox(height: 10.0),
@@ -125,36 +273,183 @@ class _ProductDetailsState extends State<ProductDetails> {
           ],
         ),
       ),
-      // bottomNavigationBar: Container(
-      //   height: 50.0,
-      //   child: Consumer<CartModel>(
-      //     builder:(context,cartModel,child){
-      //       return RaisedButton(
-      //         child: Text(
-      //           "ADD TO CART",
-      //           style: TextStyle(
-      //             color: Colors.white,
-      //           ),
-      //         ),
-      //         color: Theme.of(context).accentColor,
-      //         onPressed: (){
-      //           if(cartModel.cart.contains(FoodInCart(widget.foodItem))){
-      //             Fluttertoast.showToast(msg: "Item Already Present In Cart");
-      //           }
-      //           else{
-      //
-      //             cartModel.addToCart(FoodInCart(widget.foodItem));
-      //             Fluttertoast.showToast(msg: "Item Added To Cart");
-      //           }
-      //           setState(() {
-      //
-      //           });
-      //         },
-      //       );
-      //     },
-      //
-      //   ),
-      // ),
+      bottomNavigationBar: Container(
+        height: 50.0,
+        child: RaisedButton(
+              child: Text(
+                "DELETE ITEM FROM DATABASE",
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+              color: Theme.of(context).accentColor,
+              onPressed: ()async{
+                await alertDialogConfirmDelete(context);
+
+                 },
+            )
+
+      ),
     );
+  }
+  alertDialogEditDishDescription(BuildContext context) async {
+    TextEditingController _textFieldController = TextEditingController();
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Edit Dish Description'),
+            content: TextField(
+              maxLines: 5,
+              controller: _textFieldController,
+              textInputAction: TextInputAction.go,
+              keyboardType: TextInputType.text,
+              textCapitalization: TextCapitalization.words,
+              decoration: InputDecoration(hintText: "Enter New Description"),
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              new FlatButton(
+                child: new Text('Submit'),
+                onPressed: () async{
+                  print("Updating Dish Description");
+                  var menuRef = FirebaseFirestore.instance.collection("menu");
+                  var query = await menuRef.where("name", isEqualTo: widget.foodItem['name']).get();
+                  var docSnapShotList = query.docs;
+                  var docName=docSnapShotList[0].id;
+                  print("Document Name="+docName);
+                  await menuRef.doc(docName).update({"description":_textFieldController.text});
+                  Navigator.of(context).pop();
+                  setState(() {
+
+                  });
+                  print("Dish Description Updated");
+
+                },
+              )
+            ],
+          );
+        });
+  }
+  alertDialogEditDishPrice(BuildContext context) async {
+    TextEditingController _textFieldController = TextEditingController();
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Edit Dish Price'),
+            content: TextField(
+              controller: _textFieldController,
+              textInputAction: TextInputAction.go,
+              keyboardType: TextInputType.text,
+              textCapitalization: TextCapitalization.words,
+              decoration: InputDecoration(hintText: "Enter New Dish Price"),
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              new FlatButton(
+                child: new Text('Submit'),
+                onPressed: () async{
+                  print("Updating Dish Price");
+                  var menuRef = FirebaseFirestore.instance.collection("menu");
+                  var query = await menuRef.where("name", isEqualTo: widget.foodItem['name']).get();
+                  var docSnapShotList = query.docs;
+                  var docName=docSnapShotList[0].id;
+                  print("Document Name="+docName);
+                  await menuRef.doc(docName).update({"name":_textFieldController.text});
+                  Navigator.of(context).pop();
+                  setState(() {
+
+                  });
+                  print("Dish Price Updated");
+
+                },
+              )
+            ],
+          );
+        });
+  }
+  alertDialogEditDishName(BuildContext context) async {
+    TextEditingController _textFieldController = TextEditingController();
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Edit Dish Name'),
+            content: TextField(
+              controller: _textFieldController,
+              textInputAction: TextInputAction.go,
+              keyboardType: TextInputType.text,
+              textCapitalization: TextCapitalization.words,
+              decoration: InputDecoration(hintText: "Enter New Dish Name"),
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              new FlatButton(
+                child: new Text('Submit'),
+                onPressed: () async{
+                  print("Updating Dish Name");
+                  var menuRef = FirebaseFirestore.instance.collection("menu");
+                  var query = await menuRef.where("name", isEqualTo: widget.foodItem['name']).get();
+                  var docSnapShotList = query.docs;
+                  var docName=docSnapShotList[0].id;
+                  print("Document Name="+docName);
+                  await menuRef.doc(docName).update({"name":_textFieldController.text});
+                  Navigator.of(context).pop();
+                  setState(() {
+
+                  });
+                  print("Dish Name Updated");
+
+                },
+              )
+            ],
+          );
+        });
+  }
+  alertDialogConfirmDelete(BuildContext context) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Delete Item from Database?'),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text('Cancel'),
+                onPressed: () async{
+                  Navigator.of(context).pop();
+                },
+              ),
+              new FlatButton(
+                child: new Text('Yes'),
+                onPressed: () async{
+                  await deleteItemFromDatabase();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (BuildContext context){
+                        return MenuScreen();
+                      },
+                    ),
+                  );
+                  },
+              ),
+            ],
+          );
+        });
   }
 }

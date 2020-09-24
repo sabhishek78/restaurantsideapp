@@ -13,6 +13,7 @@ class MenuScreen extends StatefulWidget {
 
 class _MenuScreenState extends State<MenuScreen> {
   final firestoreInstance = FirebaseFirestore.instance;
+
   List<Map> foods = [];
 
   List<String> categories = [];
@@ -20,7 +21,7 @@ class _MenuScreenState extends State<MenuScreen> {
   getMenu() {
     firestoreInstance.collection("menu").get().then((querySnapshot) {
       querySnapshot.docs.forEach((result) {
-        print(result.data());
+        // print(result.data());
         foods.add(result.data());
       }
       );
@@ -45,9 +46,9 @@ class _MenuScreenState extends State<MenuScreen> {
         }
       });
     }
-    print("List of Categories:");
+    // print("List of Categories:");
     categories.sort();
-    print(categories);
+    // print(categories);
     return categories;
   }
   @override
@@ -128,7 +129,7 @@ class _MenuScreenState extends State<MenuScreen> {
           itemCount: temp.length,
           itemBuilder: (BuildContext context, int index) {
             Map food = temp[index];
-            print(food);
+            // print(food);
             return GridProduct(
               // cart:widget.cart,
               food:food,

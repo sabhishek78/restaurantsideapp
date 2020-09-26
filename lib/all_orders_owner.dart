@@ -129,7 +129,7 @@ class _AllOrdersOwnerScreenState extends State<AllOrdersOwnerScreen> {
                       }
                       ),
                     ),
-                    Text("Time:"+orders[index]["timestamp"],
+                    Text("Time:"+orders[index]["timestamp"].toString(),
                         style: TextStyle(color: Colors.red,)),
                     Text("UserId:"+orders[index]["userId"],
                         style: TextStyle(color: Colors.blue,)),

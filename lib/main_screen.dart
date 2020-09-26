@@ -10,6 +10,7 @@ import 'package:restaurantsideapp/delivered_orders.dart';
 import 'package:restaurantsideapp/menu.dart';
 import 'package:restaurantsideapp/out_for_delivery.dart';
 import 'package:restaurantsideapp/pending_orders.dart';
+import 'package:restaurantsideapp/redeem_menu.dart';
 
 class MainScreen extends StatefulWidget {
   MainScreen({Key key}) : super(key: key);
@@ -23,6 +24,7 @@ class _MainScreenState extends State<MainScreen> {
   final firestoreInstance = FirebaseFirestore.instance;
   FirebaseAuth auth = FirebaseAuth.instance;
   String workStatus="";
+
   getWorkStatus()async{
     var staffRef = FirebaseFirestore.instance.collection("staff");
     var query = await staffRef.where("id", isEqualTo: user.email).get();
@@ -164,6 +166,30 @@ class _MainScreenState extends State<MainScreen> {
                       MaterialPageRoute(
                         builder: (BuildContext context){
                           return MenuScreen();
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            if(workStatus=="manager" || workStatus=="owner")
+              Container(
+                padding: EdgeInsets.fromLTRB(5,5,10,5),
+                width: 150.0,
+                height: 50.0,
+                child: FlatButton(
+                  color: Colors.red,
+                  child: Text(
+                    "View/Change Redeem Menu".toUpperCase(),
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  onPressed: (){
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (BuildContext context){
+                          return RedeemMenuScreen();
                         },
                       ),
                     );

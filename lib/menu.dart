@@ -20,16 +20,16 @@ class _MenuScreenState extends State<MenuScreen> {
   bool isLoading = true;
   getMenu() {
     firestoreInstance.collection("menu").get().then((querySnapshot) {
-      querySnapshot.docs.forEach((result) {
-        // print(result.data());
-        foods.add(result.data());
+        querySnapshot.docs.forEach((result) {
+          // print(result.data());
+          foods.add(result.data());
+        }
+        );
+        categories = getCategories(foods);
+        isLoading = false;
+        setState(() {});
       }
       );
-       categories = getCategories(foods);
-      isLoading = false;
-      setState(() {});
-    }
-    );
   }
   void initState() {
     super.initState();

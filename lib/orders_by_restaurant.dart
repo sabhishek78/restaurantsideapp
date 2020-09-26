@@ -5,15 +5,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class AllOrdersScreen extends StatefulWidget {
+class OrdersByRestaurantScreen extends StatefulWidget {
 
-  AllOrdersScreen({Key key}) : super(key: key);
+  OrdersByRestaurantScreen({Key key}) : super(key: key);
 
   @override
-  _AllOrdersScreenState createState() => _AllOrdersScreenState();
+  _OrdersByRestaurantScreenState createState() => _OrdersByRestaurantScreenState();
 }
 
-class _AllOrdersScreenState extends State<AllOrdersScreen> {
+class _OrdersByRestaurantScreenState extends State<OrdersByRestaurantScreen> {
   User user = FirebaseAuth.instance.currentUser;
   final firestoreInstance = FirebaseFirestore.instance;
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -37,6 +37,21 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
       print(orderSnapShotList);
       for (int i = 0; i < orderSnapShotList.length; i++) {
         Map temp = orderSnapShotList[i].data();
+        String timeStamp=temp["timestamp"];
+        String formattedTimestamp="";
+        for(int i=0;i<timeStamp.length;i++){
+          if(i<10)
+          formattedTimestamp+=timeStamp[i];
+          if(i==10)
+            formattedTimestamp+=" ";
+          if(i>10 && i<16)
+            formattedTimestamp+=timeStamp[i];
+          if(i==16){
+            formattedTimestamp+=" Hrs";
+            break;
+          }
+        }
+        temp["timestamp"]=formattedTimestamp;
         orders.add(temp);
       }
       print(orders);
@@ -44,17 +59,13 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
       setState(() {
 
       });
-
-
   }
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     fetchOrders();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,8 +83,7 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
         ),
         elevation: 0.0,
         actions: <Widget>[
-
-        ],
+          ],
       ),
       body: isLoading
           ? Center(
@@ -128,7 +138,6 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
                         style: TextStyle(color: Colors.black)),
                     Text("Status:"+orders[index]["status"],
                         style: TextStyle(color: Colors.black)),
-
                   ],
                 ),
               ));

@@ -30,6 +30,21 @@ class _AllOrdersOwnerScreenState extends State<AllOrdersOwnerScreen> {
     print(orderSnapShotList);
     for (int i = 0; i < orderSnapShotList.length; i++) {
       Map temp = orderSnapShotList[i].data();
+      String timeStamp=temp["timestamp"];
+      String formattedTimestamp="";
+      for(int i=0;i<timeStamp.length;i++){
+        if(i<10)
+          formattedTimestamp+=timeStamp[i];
+        if(i==10)
+          formattedTimestamp+=" ";
+        if(i>10 && i<16)
+          formattedTimestamp+=timeStamp[i];
+        if(i==16){
+          formattedTimestamp+=" Hrs";
+          break;
+        }
+      }
+      temp["timestamp"]=formattedTimestamp;
       orders.add(temp);
     }
     print(orders);

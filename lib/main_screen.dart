@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:restaurantsideapp/accepted_orders.dart';
-import 'package:restaurantsideapp/all_orders.dart';
+import 'package:restaurantsideapp/orders_by_restaurant.dart';
 import 'package:restaurantsideapp/all_orders_owner.dart';
 import 'package:restaurantsideapp/delivered_orders.dart';
 import 'package:restaurantsideapp/menu.dart';
@@ -213,7 +213,7 @@ class _MainScreenState extends State<MainScreen> {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (BuildContext context){
-                          return AllOrdersScreen();
+                          return OrdersByRestaurantScreen();
                         },
                       ),
                     );

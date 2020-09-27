@@ -56,6 +56,7 @@ class _MainScreenState extends State<MainScreen> {
       body: Center(
         child: Column(
           children: <Widget>[
+            if(workStatus=="manager" || workStatus=="worker")
             Container(
               padding: EdgeInsets.fromLTRB(5,5,10,5),
               width: 150.0,
@@ -79,6 +80,7 @@ class _MainScreenState extends State<MainScreen> {
                 },
               ),
             ),
+            if(workStatus=="manager" || workStatus=="worker")
             Container(
               padding: EdgeInsets.fromLTRB(5,5,10,5),
               width: 150.0,
@@ -102,6 +104,7 @@ class _MainScreenState extends State<MainScreen> {
                 },
               ),
             ),
+            if(workStatus=="manager" || workStatus=="worker")
             Container(
               padding: EdgeInsets.fromLTRB(5,5,10,5),
               width: 150.0,
@@ -125,6 +128,7 @@ class _MainScreenState extends State<MainScreen> {
                 },
               ),
             ),
+            if(workStatus=="manager" || workStatus=="worker")
             Container(
               padding: EdgeInsets.fromLTRB(5,5,10,5),
               width: 150.0,

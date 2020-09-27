@@ -10,7 +10,8 @@ import 'package:restaurantsideapp/redeem_menu.dart';
 
 class RedeemProductDetails extends StatefulWidget {
   final Map foodItem;
-  RedeemProductDetails({Key key, @required this.foodItem}) : super(key: key);
+  final Function updateRedeemMenuScreenState;
+  RedeemProductDetails({Key key, @required this.foodItem,@required this.updateRedeemMenuScreenState}) : super(key: key);
   @override
   _RedeemProductDetailsState createState() => _RedeemProductDetailsState();
 }
@@ -20,6 +21,8 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
   final FirebaseStorage _storage =
   FirebaseStorage(storageBucket: 'gs://restaurantapp-65d0e.appspot.com');
   StorageUploadTask _uploadTask;
+  Map foodItem=new Map();
+  bool isLoading=true;
 
   deleteItemFromDatabase()async{
     DocumentReference documentReference = FirebaseFirestore.instance.collection('redeemMenu').doc(widget.foodItem["name"]);
@@ -33,14 +36,11 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
     _uploadTask = _storage.ref().child(fileName).putFile(_image);
     String docUrl = await (await _uploadTask.onComplete).ref.getDownloadURL();
     var menuRef = FirebaseFirestore.instance.collection("redeemMenu");
-    var query = await menuRef.where("name", isEqualTo: widget.foodItem['name']).get();
+    var query = await menuRef.where("name", isEqualTo: foodItem['name']).get();
     var docSnapShotList = query.docs;
     var docName=docSnapShotList[0].id;
     print("Document Name="+docName);
     await menuRef.doc(docName).update({"image":docUrl});
-    setState(() {
-
-    });
     print("Uploaded image to firebase");
   }
   _imgFromCamera() async {
@@ -76,13 +76,10 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
                       onTap: () async{
                         await _imgFromGallery();
                         await uploadPhotoToFirebase();
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (BuildContext context){
-                              return RedeemMenuScreen();
-                            },
-                          ),
-                        );
+                        getFoodItemDetails();
+                        setState(() {
+
+                        });
                       }),
                   new ListTile(
                     leading: new Icon(Icons.photo_camera),
@@ -90,13 +87,10 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
                     onTap: () async{
                       await _imgFromCamera();
                       await uploadPhotoToFirebase();
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (BuildContext context){
-                            return RedeemMenuScreen();
-                          },
-                        ),
-                      );
+                      getFoodItemDetails();
+                      setState(() {
+
+                      });
                     },
                   ),
                 ],
@@ -106,17 +100,22 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
         }
     );
   }
-  // getFoodItemDetails()async{
-  //   var menuRef = FirebaseFirestore.instance.collection("menu");
-  //   var query = await menuRef.where("name", isEqualTo: widget.foodItem['name']).get();
-  //   var docSnapShotList = query.docs;
-  //   item=docSnapShotList[0].data()
-  //   print("Dish Description Updated");
-  // }
-  // void initState() {
-  //   super.initState();
-  //   getFoodItemDetails();
-  // }
+  getFoodItemDetails()async{
+    print("fetching food item details from Firebase");
+    var menuRef = FirebaseFirestore.instance.collection("redeemMenu");
+    var query = await menuRef.where("name", isEqualTo: widget.foodItem['name']).get();
+    var docSnapShotList =query.docs;
+    foodItem=docSnapShotList[0].data();
+    print(foodItem);
+    isLoading=false;
+    setState(() {
+
+    });
+  }
+  void initState() {
+    super.initState();
+    getFoodItemDetails();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -137,7 +136,14 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
         ],
       ),
 
-      body: Padding(
+      body: isLoading
+          ? Center(
+        child: CircularProgressIndicator(
+          backgroundColor: Colors.cyan,
+          strokeWidth: 5,
+        ),
+      )
+          :Padding(
         padding: EdgeInsets.fromLTRB(10.0,0,10.0,0),
         child: ListView(
           children: <Widget>[
@@ -150,7 +156,7 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8.0),
                     child: Image.network(
-                      widget.foodItem['image'],
+                      foodItem['image'],
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -182,26 +188,13 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
             Row(
               children: <Widget>[
                 Text(
-                  widget.foodItem["name"],
+                  foodItem["name"],
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
                   ),
                   maxLines: 2,
                 ),
-                IconButton(
-                  icon: Icon(
-                    Icons.edit,
-                    size: 20.0,
-                  ),
-                  onPressed: ()async {
-                    await alertDialogEditDishName(context);
-                    setState(() {
-
-                    });
-                  },
-                  tooltip: "Edit",
-                )
               ],
             ),
             Padding(
@@ -209,7 +202,7 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
               child: Row(
                 children: <Widget>[
                   Text(
-                    widget.foodItem["points"].toString(),
+                    foodItem["points"].toString(),
                     style: TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w900,
@@ -223,9 +216,11 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
                     ),
                     onPressed: ()async {
                       await alertDialogEditDishPoints(context);
-                      setState(() {
-
-                      });
+                       widget.updateRedeemMenuScreenState();
+                      getFoodItemDetails();
+                      // setState(() {
+                      //
+                      // });
                     },
                     tooltip: "Edit",
                   )
@@ -254,9 +249,11 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
                   ),
                   onPressed: ()async {
                     await alertDialogEditDishDescription(context);
-                    setState(() {
-
-                    });
+                     widget.updateRedeemMenuScreenState();
+                    getFoodItemDetails();
+                    // setState(() {
+                    //
+                    // });
                   },
                   tooltip: "Edit",
                 )
@@ -266,7 +263,7 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
             SizedBox(height: 10.0),
 
             Text(
-              widget.foodItem["description"],
+              foodItem["description"],
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w300,
@@ -287,6 +284,10 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
             color: Theme.of(context).accentColor,
             onPressed: ()async{
               await alertDialogConfirmDelete(context);
+               widget.updateRedeemMenuScreenState();
+              setState(() {
+
+              });
 
             },
           )
@@ -321,7 +322,7 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
                 onPressed: () async{
                   print("Updating Dish Description");
                   var menuRef = FirebaseFirestore.instance.collection("redeemMenu");
-                  var query = await menuRef.where("name", isEqualTo: widget.foodItem['name']).get();
+                  var query = await menuRef.where("name", isEqualTo:foodItem['name']).get();
                   var docSnapShotList = query.docs;
                   var docName=docSnapShotList[0].id;
                   print("Document Name="+docName);
@@ -364,59 +365,17 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
                 onPressed: () async{
                   print("Updating Dish Points");
                   var menuRef = FirebaseFirestore.instance.collection("redeemMenu");
-                  var query = await menuRef.where("name", isEqualTo: widget.foodItem['name']).get();
+                  var query = await menuRef.where("name", isEqualTo: foodItem['name']).get();
                   var docSnapShotList = query.docs;
                   var docName=docSnapShotList[0].id;
                   print("Document Name="+docName);
-                  await menuRef.doc(docName).update({"name":_textFieldController.text});
+                  await menuRef.doc(docName).update({"points":int.parse(_textFieldController.text)});
                   Navigator.of(context).pop();
+
                   setState(() {
 
                   });
                   print("Dish Points Updated");
-
-                },
-              )
-            ],
-          );
-        });
-  }
-  alertDialogEditDishName(BuildContext context) async {
-    TextEditingController _textFieldController = TextEditingController();
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Edit Dish Name'),
-            content: TextField(
-              controller: _textFieldController,
-              textInputAction: TextInputAction.go,
-              keyboardType: TextInputType.text,
-              textCapitalization: TextCapitalization.words,
-              decoration: InputDecoration(hintText: "Enter New Dish Name"),
-            ),
-            actions: <Widget>[
-              new FlatButton(
-                child: new Text('Cancel'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              new FlatButton(
-                child: new Text('Submit'),
-                onPressed: () async{
-                  print("Updating Dish Name");
-                  var menuRef = FirebaseFirestore.instance.collection("redeemMenu");
-                  var query = await menuRef.where("name", isEqualTo: widget.foodItem['name']).get();
-                  var docSnapShotList = query.docs;
-                  var docName=docSnapShotList[0].id;
-                  print("Document Name="+docName);
-                  await menuRef.doc(docName).update({"name":_textFieldController.text});
-                  Navigator.of(context).pop();
-                  setState(() {
-
-                  });
-                  print("Dish Name Updated");
 
                 },
               )

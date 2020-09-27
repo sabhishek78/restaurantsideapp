@@ -18,6 +18,7 @@ class _RedeemMenuScreenState extends State<RedeemMenuScreen> {
   List<Map> foods = [];
   bool isLoading = true;
   getRedeemMenu() {
+    foods = [];
     firestoreInstance.collection("redeemMenu").get().then((querySnapshot) {
       querySnapshot.docs.forEach((result) {
         // print(result.data());
@@ -33,7 +34,12 @@ class _RedeemMenuScreenState extends State<RedeemMenuScreen> {
     super.initState();
     getRedeemMenu();
   }
+  updateRedeemMenuScreenState(){
+     getRedeemMenu();
+    setState(() {
 
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,7 +85,7 @@ class _RedeemMenuScreenState extends State<RedeemMenuScreen> {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (BuildContext context){
-                          return RedeemProductDetails(foodItem: foods[index]);
+                          return RedeemProductDetails(foodItem: foods[index],updateRedeemMenuScreenState:updateRedeemMenuScreenState);
                         },
                       ),
                     );

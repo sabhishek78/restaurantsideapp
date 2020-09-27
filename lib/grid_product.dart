@@ -6,11 +6,13 @@ class GridProduct extends StatelessWidget {
   final Map food;
   final String name;
   final String img;
+  final Function updateMenuScreenState;
 
 
 
   GridProduct({
     Key key,
+    @required this.updateMenuScreenState,
     @required this.food,
     @required this.name,
     @required this.img,
@@ -59,7 +61,7 @@ class GridProduct extends StatelessWidget {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (BuildContext context){
-              return ProductDetails(foodItem: food);
+              return ProductDetails(foodItem: food,updateMenuScreenState:updateMenuScreenState);
             },
           ),
         );

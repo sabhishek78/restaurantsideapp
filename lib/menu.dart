@@ -35,6 +35,12 @@ class _MenuScreenState extends State<MenuScreen> {
     super.initState();
     getMenu();
   }
+  updateMenuScreenState(){
+    getMenu();
+    setState(() {
+
+    });
+  }
   getCategories(List<Map<dynamic, dynamic>> foods) {
     List<String> categories = [];
     for (var i = 0; i < foods.length; i++) {
@@ -131,7 +137,7 @@ class _MenuScreenState extends State<MenuScreen> {
             Map food = temp[index];
             // print(food);
             return GridProduct(
-              // cart:widget.cart,
+              updateMenuScreenState:updateMenuScreenState,
               food:food,
               img: food['image'],
               // isFav: false,

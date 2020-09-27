@@ -8,7 +8,8 @@ import 'dart:io';
 
 class ProductDetails extends StatefulWidget {
   final Map foodItem;
-  ProductDetails({Key key, @required this.foodItem}) : super(key: key);
+  final Function updateMenuScreenState;
+  ProductDetails({Key key, @required this.foodItem,@required this.updateMenuScreenState}) : super(key: key);
   @override
   _ProductDetailsState createState() => _ProductDetailsState();
 }
@@ -18,6 +19,8 @@ class _ProductDetailsState extends State<ProductDetails> {
   final FirebaseStorage _storage =
   FirebaseStorage(storageBucket: 'gs://restaurantapp-65d0e.appspot.com');
   StorageUploadTask _uploadTask;
+  Map foodItem=new Map();
+  bool isLoading;
 
   deleteItemFromDatabase()async{
     DocumentReference documentReference = FirebaseFirestore.instance.collection('menu').doc(widget.foodItem["name"]);
@@ -74,13 +77,10 @@ class _ProductDetailsState extends State<ProductDetails> {
                       onTap: () async{
                        await _imgFromGallery();
                        await uploadPhotoToFirebase();
-                       Navigator.of(context).push(
-                         MaterialPageRoute(
-                           builder: (BuildContext context){
-                             return MenuScreen();
-                           },
-                         ),
-                       );
+                       await widget.updateMenuScreenState();
+                       await getFoodItemDetails();
+                       Navigator.of(context).pop();
+
                       }),
                   new ListTile(
                     leading: new Icon(Icons.photo_camera),
@@ -88,14 +88,10 @@ class _ProductDetailsState extends State<ProductDetails> {
                     onTap: () async{
                      await _imgFromCamera();
                      await uploadPhotoToFirebase();
-                     Navigator.of(context).push(
-                       MaterialPageRoute(
-                         builder: (BuildContext context){
-                           return MenuScreen();
-                         },
-                       ),
-                     );
-                    },
+                     await widget.updateMenuScreenState();
+                     await getFoodItemDetails();
+                     Navigator.of(context).pop();
+                     },
                   ),
                 ],
               ),
@@ -104,17 +100,23 @@ class _ProductDetailsState extends State<ProductDetails> {
         }
     );
   }
-  // getFoodItemDetails()async{
-  //   var menuRef = FirebaseFirestore.instance.collection("menu");
-  //   var query = await menuRef.where("name", isEqualTo: widget.foodItem['name']).get();
-  //   var docSnapShotList = query.docs;
-  //   item=docSnapShotList[0].data()
-  //   print("Dish Description Updated");
-  // }
-  // void initState() {
-  //   super.initState();
-  //   getFoodItemDetails();
-  // }
+  getFoodItemDetails()async{
+    print("fetching food item details from Firebase");
+    var menuRef = FirebaseFirestore.instance.collection("menu");
+    var query = await menuRef.where("name", isEqualTo: widget.foodItem['name']).get();
+    var docSnapShotList =query.docs;
+    foodItem=docSnapShotList[0].data();
+    print(foodItem);
+    isLoading=false;
+    setState(() {
+
+    });
+  }
+  void initState() {
+    super.initState();
+    isLoading=true;
+    getFoodItemDetails();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -135,7 +137,14 @@ class _ProductDetailsState extends State<ProductDetails> {
           ],
       ),
 
-      body: Padding(
+      body:isLoading
+          ? Center(
+        child: CircularProgressIndicator(
+          backgroundColor: Colors.cyan,
+          strokeWidth: 5,
+        ),
+      )
+          : Padding(
         padding: EdgeInsets.fromLTRB(10.0,0,10.0,0),
         child: ListView(
           children: <Widget>[
@@ -148,7 +157,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8.0),
                     child: Image.network(
-                      widget.foodItem['image'],
+                      foodItem['image'],
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -180,26 +189,13 @@ class _ProductDetailsState extends State<ProductDetails> {
             Row(
               children: <Widget>[
                 Text(
-                  widget.foodItem["name"],
+                  foodItem["name"],
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
                   ),
                   maxLines: 2,
                 ),
-                IconButton(
-                  icon: Icon(
-                    Icons.edit,
-                    size: 20.0,
-                  ),
-                  onPressed: ()async {
-                    await alertDialogEditDishName(context);
-                    setState(() {
-
-                    });
-                  },
-                  tooltip: "Edit",
-                )
               ],
             ),
             Padding(
@@ -207,7 +203,7 @@ class _ProductDetailsState extends State<ProductDetails> {
               child: Row(
                 children: <Widget>[
                   Text(
-                    "\$ "+widget.foodItem["price"].toString(),
+                    "\$ "+foodItem["price"].toString(),
                     style: TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w900,
@@ -221,9 +217,9 @@ class _ProductDetailsState extends State<ProductDetails> {
                     ),
                     onPressed: ()async {
                       await alertDialogEditDishPrice(context);
-                      setState(() {
+                      await widget.updateMenuScreenState();
+                      await getFoodItemDetails();
 
-                      });
                     },
                     tooltip: "Edit",
                   )
@@ -252,9 +248,9 @@ class _ProductDetailsState extends State<ProductDetails> {
                   ),
                   onPressed: ()async {
                     await alertDialogEditDishDescription(context);
-                    setState(() {
+                    await widget.updateMenuScreenState();
+                    await getFoodItemDetails();
 
-                    });
                   },
                   tooltip: "Edit",
                 )
@@ -264,7 +260,7 @@ class _ProductDetailsState extends State<ProductDetails> {
             SizedBox(height: 10.0),
 
             Text(
-              widget.foodItem["description"],
+              foodItem["description"],
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w300,
@@ -285,6 +281,8 @@ class _ProductDetailsState extends State<ProductDetails> {
               color: Theme.of(context).accentColor,
               onPressed: ()async{
                 await alertDialogConfirmDelete(context);
+                await widget.updateMenuScreenState();
+
 
                  },
             )
@@ -319,7 +317,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                 onPressed: () async{
                   print("Updating Dish Description");
                   var menuRef = FirebaseFirestore.instance.collection("menu");
-                  var query = await menuRef.where("name", isEqualTo: widget.foodItem['name']).get();
+                  var query = await menuRef.where("name", isEqualTo: foodItem['name']).get();
                   var docSnapShotList = query.docs;
                   var docName=docSnapShotList[0].id;
                   print("Document Name="+docName);
@@ -362,11 +360,11 @@ class _ProductDetailsState extends State<ProductDetails> {
                 onPressed: () async{
                   print("Updating Dish Price");
                   var menuRef = FirebaseFirestore.instance.collection("menu");
-                  var query = await menuRef.where("name", isEqualTo: widget.foodItem['name']).get();
+                  var query = await menuRef.where("name", isEqualTo: foodItem['name']).get();
                   var docSnapShotList = query.docs;
                   var docName=docSnapShotList[0].id;
                   print("Document Name="+docName);
-                  await menuRef.doc(docName).update({"name":_textFieldController.text});
+                  await menuRef.doc(docName).update({"price":int.parse(_textFieldController.text)});
                   Navigator.of(context).pop();
                   setState(() {
 
@@ -379,49 +377,7 @@ class _ProductDetailsState extends State<ProductDetails> {
           );
         });
   }
-  alertDialogEditDishName(BuildContext context) async {
-    TextEditingController _textFieldController = TextEditingController();
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Edit Dish Name'),
-            content: TextField(
-              controller: _textFieldController,
-              textInputAction: TextInputAction.go,
-              keyboardType: TextInputType.text,
-              textCapitalization: TextCapitalization.words,
-              decoration: InputDecoration(hintText: "Enter New Dish Name"),
-            ),
-            actions: <Widget>[
-              new FlatButton(
-                child: new Text('Cancel'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              new FlatButton(
-                child: new Text('Submit'),
-                onPressed: () async{
-                  print("Updating Dish Name");
-                  var menuRef = FirebaseFirestore.instance.collection("menu");
-                  var query = await menuRef.where("name", isEqualTo: widget.foodItem['name']).get();
-                  var docSnapShotList = query.docs;
-                  var docName=docSnapShotList[0].id;
-                  print("Document Name="+docName);
-                  await menuRef.doc(docName).update({"name":_textFieldController.text});
-                  Navigator.of(context).pop();
-                  setState(() {
 
-                  });
-                  print("Dish Name Updated");
-
-                },
-              )
-            ],
-          );
-        });
-  }
   alertDialogConfirmDelete(BuildContext context) async {
     return showDialog(
         context: context,

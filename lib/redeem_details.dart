@@ -76,10 +76,10 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
                       onTap: () async{
                         await _imgFromGallery();
                         await uploadPhotoToFirebase();
-                        getFoodItemDetails();
-                        setState(() {
+                        await widget.updateRedeemMenuScreenState();
+                        await getFoodItemDetails();
+                        Navigator.of(context).pop();
 
-                        });
                       }),
                   new ListTile(
                     leading: new Icon(Icons.photo_camera),
@@ -87,10 +87,10 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
                     onTap: () async{
                       await _imgFromCamera();
                       await uploadPhotoToFirebase();
-                      getFoodItemDetails();
-                      setState(() {
+                      await widget.updateRedeemMenuScreenState();
+                      await getFoodItemDetails();
+                      Navigator.of(context).pop();
 
-                      });
                     },
                   ),
                 ],
@@ -218,6 +218,7 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
                       await alertDialogEditDishPoints(context);
                        widget.updateRedeemMenuScreenState();
                       getFoodItemDetails();
+
                       // setState(() {
                       //
                       // });

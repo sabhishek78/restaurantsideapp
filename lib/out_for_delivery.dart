@@ -111,12 +111,22 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
                         }
                         ),
                       ),
+                      Text("Time:"+orders[index]["timestamp"],
+                          style: TextStyle(color: Colors.red,)),
                       Text("UserId:"+orders[index]["userId"],
                           style: TextStyle(color: Colors.blue,)),
+                      Text("First Name:"+orders[index]["firstName"],
+                          style: TextStyle(color: Colors.green,)),
+                      Text("Last Name:"+orders[index]["lastName"],
+                          style: TextStyle(color: Colors.red,)),
+                      Text("Phone number :"+orders[index]["phoneNumber"],
+                          style: TextStyle(color: Colors.blue,)),
+                      Text("Address:"+orders[index]["address"],
+                          style: TextStyle(color: Colors.green,)),
                       Text("PaymentMode:"+orders[index]["paymentMode"],
                           style: TextStyle(color: Colors.green)),
                       Text("Total:"+orders[index]["total"].toString(),
-                          style: TextStyle(color: Colors.red)),
+                          style: TextStyle(color: Colors.black)),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[

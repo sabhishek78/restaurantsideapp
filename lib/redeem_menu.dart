@@ -4,6 +4,7 @@ import 'package:restaurantsideapp/add_menu_item.dart';
 import 'package:restaurantsideapp/add_redeem_menu_item.dart';
 import 'package:restaurantsideapp/details.dart';
 import 'package:restaurantsideapp/grid_product.dart';
+import 'package:restaurantsideapp/main_screen.dart';
 import 'package:restaurantsideapp/redeem_details.dart';
 
 
@@ -49,11 +50,19 @@ class _RedeemMenuScreenState extends State<RedeemMenuScreen> {
           icon: Icon(
             Icons.keyboard_backspace,
           ),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (BuildContext context){
+                  return MainScreen();
+                },
+              ),
+            );
+          },
         ),
         centerTitle: true,
         title: Text(
-          "Redeem Menu Items",
+          "Canjear elementos del menú",//Redeem Menu Items
         ),
         elevation: 0.0,
         actions: <Widget>[
@@ -105,7 +114,7 @@ class _RedeemMenuScreenState extends State<RedeemMenuScreen> {
             ),
           );
         },
-        label: Text('Add New Item'),
+        label: Text('Agregar ítem nuevo'),//Add New Item
         icon: Icon(Icons.add),
         backgroundColor: Colors.pink,
       ),

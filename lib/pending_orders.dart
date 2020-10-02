@@ -65,7 +65,7 @@ class _PendingOrdersScreenState extends State<PendingOrdersScreen> {
         ),
         centerTitle: true,
         title: Text(
-          " PENDING ORDERS",
+          "ORDENES PENDIENTES",// PENDING ORDERS
         ),
         elevation: 0.0,
         actions: <Widget>[
@@ -83,16 +83,12 @@ class _PendingOrdersScreenState extends State<PendingOrdersScreen> {
         itemCount: orders.length,
         itemBuilder: (context, index) {
           return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                margin: const EdgeInsets.all(10.0),
-                padding: const EdgeInsets.all(10.0),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.red, //                   <--- border color
-                    width: 5.0,
-                  ),
-                ),
+            padding: const EdgeInsets.all(8.0),
+            child: Card(
+              color:Colors.blue[100],
+              shadowColor: Colors.grey,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: <Widget>[
                     Column(
@@ -132,7 +128,7 @@ class _PendingOrdersScreenState extends State<PendingOrdersScreen> {
                           child: FlatButton(
                             color: Colors.green,
                             child: Text(
-                              "Accept Order".toUpperCase(),
+                              "Aceptar orden".toUpperCase(),//Accept Order
                               style: TextStyle(
                                 color: Colors.white,
                               ),
@@ -157,7 +153,7 @@ class _PendingOrdersScreenState extends State<PendingOrdersScreen> {
                           child: FlatButton(
                             color: Colors.red,
                             child: Text(
-                              "Reject Order".toUpperCase(),
+                              "Rechazar orden".toUpperCase(),//Reject Order
                               style: TextStyle(
                                 color: Colors.white,
                               ),
@@ -179,7 +175,9 @@ class _PendingOrdersScreenState extends State<PendingOrdersScreen> {
                     ),
                   ],
                 ),
-              ));
+              ),
+            ),
+          );
         },
       ),
     );

@@ -65,7 +65,7 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
         ),
         centerTitle: true,
         title: Text(
-          "OUT FOR DELIVERY",
+          "FUERA PARA ENTREGA",//OUT FOR DELIVERY
         ),
         elevation: 0.0,
         actions: <Widget>[
@@ -84,53 +84,46 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
         itemBuilder: (context, index) {
           return Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Container(
-                margin: const EdgeInsets.all(10.0),
-                padding: const EdgeInsets.all(10.0),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.red, //                   <--- border color
-                    width: 5.0,
-                  ),
-                ),
-                child: Column(
-                  children: <Widget>[
-                    Column(
-                      children: List.generate(orders[index]["order"].length, (i) {
-                        return Container(
-                          child: Column(
-                            children: <Widget>[
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Text("Name :"+orders[index]["order"][i]["name"],
-                                      style: TextStyle(color: Colors.black)),
-                                  Text("Quantity :"+orders[index]["order"][i]["quantity"].toString(),
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ],
-                          ),
-                        );
-                      }
+              child: Card(
+                color: Colors.blue[100],
+                shadowColor: Colors.grey,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: <Widget>[
+                      Column(
+                        children: List.generate(orders[index]["order"].length, (i) {
+                          return Container(
+                            child: Column(
+                              children: <Widget>[
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Text("Name :"+orders[index]["order"][i]["name"],
+                                        style: TextStyle(color: Colors.red)),
+                                    Text("Quantity :"+orders[index]["order"][i]["quantity"].toString(),
+                                        style: TextStyle(color: Colors.black)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                        ),
                       ),
-                    ),
-                    Text("UserId:"+orders[index]["userId"],
-                        style: TextStyle(color: Colors.black,)),
-                    Text("PaymentMode:"+orders[index]["paymentMode"],
-                        style: TextStyle(color: Colors.black)),
-                    Text("Total:"+orders[index]["total"].toString(),
-                        style: TextStyle(color: Colors.black)),
-                    Row(
-                      children: <Widget>[
-                        Container(
-                          padding: EdgeInsets.fromLTRB(5,5,10,5),
-                          width: 150.0,
-                          height: 50.0,
-                          child: FlatButton(
+                      Text("UserId:"+orders[index]["userId"],
+                          style: TextStyle(color: Colors.blue,)),
+                      Text("PaymentMode:"+orders[index]["paymentMode"],
+                          style: TextStyle(color: Colors.green)),
+                      Text("Total:"+orders[index]["total"].toString(),
+                          style: TextStyle(color: Colors.red)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          FlatButton(
                             color: Colors.green,
                             child: Text(
-                              "Delivered".toUpperCase(),
+                              "Confirm Delivered".toUpperCase(),
                               style: TextStyle(
                                 color: Colors.white,
                               ),
@@ -147,26 +140,26 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
                               });
                             },
                           ),
-                        ),
-                        // Container(
-                        //   padding: EdgeInsets.fromLTRB(5,5,10,5),
-                        //   width: 150.0,
-                        //   height: 50.0,
-                        //   child: FlatButton(
-                        //     color: Colors.red,
-                        //     child: Text(
-                        //       "Reject Order".toUpperCase(),
-                        //       style: TextStyle(
-                        //         color: Colors.white,
-                        //       ),
-                        //     ),
-                        //     onPressed: (){
-                        //     },
-                        //   ),
-                        // ),
-                      ],
-                    ),
-                  ],
+                          // Container(
+                          //   padding: EdgeInsets.fromLTRB(5,5,10,5),
+                          //   width: 150.0,
+                          //   height: 50.0,
+                          //   child: FlatButton(
+                          //     color: Colors.red,
+                          //     child: Text(
+                          //       "Reject Order".toUpperCase(),
+                          //       style: TextStyle(
+                          //         color: Colors.white,
+                          //       ),
+                          //     ),
+                          //     onPressed: (){
+                          //     },
+                          //   ),
+                          // ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ));
         },

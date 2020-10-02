@@ -4,12 +4,14 @@ import 'package:restaurantsideapp/menu.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
+import 'package:fluttertoast/fluttertoast.dart';
 
 
 class ProductDetails extends StatefulWidget {
   final Map foodItem;
   final Function updateMenuScreenState;
-  ProductDetails({Key key, @required this.foodItem,@required this.updateMenuScreenState}) : super(key: key);
+  final List<String> categories;
+  ProductDetails({Key key, @required this.foodItem,@required this.updateMenuScreenState,@required this.categories}) : super(key: key);
   @override
   _ProductDetailsState createState() => _ProductDetailsState();
 }
@@ -21,6 +23,10 @@ class _ProductDetailsState extends State<ProductDetails> {
   StorageUploadTask _uploadTask;
   Map foodItem=new Map();
   bool isLoading;
+  List<String> categories = []; // Option 2
+  String selectedCategory; // Option 2
+  final TextEditingController _categoryController =
+  new TextEditingController();
 
   deleteItemFromDatabase()async{
     DocumentReference documentReference = FirebaseFirestore.instance.collection('menu').doc(widget.foodItem["name"]);
@@ -73,7 +79,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                 children: <Widget>[
                   new ListTile(
                       leading: new Icon(Icons.photo_library),
-                      title: new Text('Photo Library'),
+                      title: new Text('Librería fotográfica'),//Photo Library
                       onTap: () async{
                        await _imgFromGallery();
                        await uploadPhotoToFirebase();
@@ -84,7 +90,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                       }),
                   new ListTile(
                     leading: new Icon(Icons.photo_camera),
-                    title: new Text('Camera'),
+                    title: new Text('Cámara'),//Camera
                     onTap: () async{
                      await _imgFromCamera();
                      await uploadPhotoToFirebase();
@@ -115,6 +121,10 @@ class _ProductDetailsState extends State<ProductDetails> {
   void initState() {
     super.initState();
     isLoading=true;
+    categories = widget.categories;
+    if(!categories.contains("Add New Category")){
+      categories.add("Add New Category");
+    }
     getFoodItemDetails();
   }
   @override
@@ -126,11 +136,14 @@ class _ProductDetailsState extends State<ProductDetails> {
           icon: Icon(
             Icons.keyboard_backspace,
           ),
-          onPressed: ()=>Navigator.pop(context),
+          onPressed: (){
+            widget.updateMenuScreenState();
+            Navigator.pop(context);
+          }
         ),
         centerTitle: true,
         title: Text(
-          "Item Details",
+          "detalles del artículo",//Item Details
         ),
         elevation: 0.0,
         actions: <Widget>[
@@ -203,7 +216,7 @@ class _ProductDetailsState extends State<ProductDetails> {
               child: Row(
                 children: <Widget>[
                   Text(
-                    "\$ "+foodItem["price"].toString(),
+                    "₲ "+foodItem["price"].toString(),
                     style: TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w900,
@@ -230,11 +243,102 @@ class _ProductDetailsState extends State<ProductDetails> {
 
 
             SizedBox(height: 20.0),
-
             Row(
               children: <Widget>[
                 Text(
-                  "Product Description",
+                  "Category",
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                  ),
+                  maxLines: 2,
+                ),
+              ],
+            ),
+            Card(
+              elevation: 3.0,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(5.0),
+                  ),
+                ),
+                child: TextField(
+                  enabled: _categoryController.text=="Add New Category"?true:false,
+                  style: TextStyle(
+                    fontSize: 15.0,
+                    color: Colors.black,
+                  ),
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.all(10.0),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                      borderSide: BorderSide(
+                        color: Colors.white,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.white,
+                      ),
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                    hintText: foodItem["category"],
+                    hintStyle: TextStyle(
+                      fontSize: 15.0,
+                      color: Colors.black,
+                    ),
+                    prefixIcon: Icon(
+                      Icons.category,
+                      color: Colors.black,
+                    ),
+                  ),
+                  maxLines: 1,
+                  controller: _categoryController,
+                ),
+              ),
+            ),
+            DropdownButton(
+              hint: Text('Cambiar categoría'),//Please choose a Category
+              // Not necessary for Option 1
+              value: selectedCategory,
+              onChanged: (newValue) {
+                setState(() {
+                  selectedCategory = newValue;
+                  _categoryController.text=selectedCategory;
+                });
+              },
+              items: categories.map((category) {
+                return DropdownMenuItem(
+                  child: new Text(category),
+                  value: category,
+                );
+              }).toList(),
+            ),
+            FlatButton(
+              child: Text('Categoría de actualización'),
+              color: Colors.blue,
+                onPressed: () async{
+                  print("Updating Dish Category");
+                  var menuRef = FirebaseFirestore.instance.collection("menu");
+                  var query = await menuRef.where("name", isEqualTo: foodItem['name']).get();
+                  var docSnapShotList = query.docs;
+                  var docName=docSnapShotList[0].id;
+                  print("Document Name="+docName);
+                  await menuRef.doc(docName).update({"category":_categoryController.text});
+                  setState(() {
+
+                  });
+                  print("Dish Category Updated");
+                  Fluttertoast.showToast(msg: "Categoría de plato actualizada");//Item Added To Cart
+
+                },
+            ),
+            Row(
+              children: <Widget>[
+                Text(
+                  "Descripción del producto",//Product Description
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
@@ -273,7 +377,7 @@ class _ProductDetailsState extends State<ProductDetails> {
         height: 50.0,
         child: RaisedButton(
               child: Text(
-                "DELETE ITEM FROM DATABASE",
+                "BORRAR ELEMENTO DE LA BASE DE DATOS",//DELETE ITEM FROM DATABASE
                 style: TextStyle(
                   color: Colors.white,
                 ),
@@ -296,18 +400,18 @@ class _ProductDetailsState extends State<ProductDetails> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Edit Dish Description'),
+            title: Text('Editar descripción del plato'),//Edit Dish Description
             content: TextField(
               maxLines: 5,
               controller: _textFieldController,
               textInputAction: TextInputAction.go,
               keyboardType: TextInputType.text,
               textCapitalization: TextCapitalization.words,
-              decoration: InputDecoration(hintText: "Enter New Description"),
+              decoration: InputDecoration(hintText: "Ingrese nueva descripción"),//Enter New Description
             ),
             actions: <Widget>[
               new FlatButton(
-                child: new Text('Cancel'),
+                child: new Text('Cancelar'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -340,25 +444,25 @@ class _ProductDetailsState extends State<ProductDetails> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Edit Dish Price'),
+            title: Text('Editar precio del plato'),//Edit Dish Price
             content: TextField(
               controller: _textFieldController,
               textInputAction: TextInputAction.go,
               keyboardType: TextInputType.text,
               textCapitalization: TextCapitalization.words,
-              decoration: InputDecoration(hintText: "Enter New Dish Price"),
+              decoration: InputDecoration(hintText: "Ingrese el nuevo precio del plato"),//Enter New Dish Price
             ),
             actions: <Widget>[
               new FlatButton(
-                child: new Text('Cancel'),
+                child: new Text('Cancelar'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               new FlatButton(
-                child: new Text('Submit'),
+                child: new Text('Enviar'),
                 onPressed: () async{
-                  print("Updating Dish Price");
+                  print("Updating Dish Price");//
                   var menuRef = FirebaseFirestore.instance.collection("menu");
                   var query = await menuRef.where("name", isEqualTo: foodItem['name']).get();
                   var docSnapShotList = query.docs;
@@ -383,7 +487,7 @@ class _ProductDetailsState extends State<ProductDetails> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Delete Item from Database?'),
+            title: Text('¿Eliminar elemento de la base de datos?'),//Delete Item from Database?
             actions: <Widget>[
               new FlatButton(
                 child: new Text('Cancel'),

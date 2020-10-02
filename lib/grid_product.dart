@@ -7,6 +7,7 @@ class GridProduct extends StatelessWidget {
   final String name;
   final String img;
   final Function updateMenuScreenState;
+  final List<String> categories;
 
 
 
@@ -16,6 +17,7 @@ class GridProduct extends StatelessWidget {
     @required this.food,
     @required this.name,
     @required this.img,
+    @required this.categories
     // @required this.isFav,
     // @required this.rating,
     // @required this.raters,
@@ -61,7 +63,7 @@ class GridProduct extends StatelessWidget {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (BuildContext context){
-              return ProductDetails(foodItem: food,updateMenuScreenState:updateMenuScreenState);
+              return ProductDetails(foodItem: food,updateMenuScreenState:updateMenuScreenState,categories: categories,);
             },
           ),
         );

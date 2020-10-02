@@ -65,7 +65,7 @@ class _AcceptedOrdersScreenState extends State<AcceptedOrdersScreen> {
         ),
         centerTitle: true,
         title: Text(
-          " ACCEPTED ORDERS",
+          "pedidos aceptados",//ACCEPTED ORDERS
         ),
         elevation: 0.0,
         actions: <Widget>[
@@ -83,16 +83,12 @@ class _AcceptedOrdersScreenState extends State<AcceptedOrdersScreen> {
         itemCount: orders.length,
         itemBuilder: (context, index) {
           return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                margin: const EdgeInsets.all(10.0),
-                padding: const EdgeInsets.all(10.0),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.red, //                   <--- border color
-                    width: 5.0,
-                  ),
-                ),
+            padding: const EdgeInsets.all(8.0),
+            child: Card(
+              color: Colors.blue[100],
+              shadowColor: Colors.grey,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: <Widget>[
                     Column(
@@ -103,10 +99,10 @@ class _AcceptedOrdersScreenState extends State<AcceptedOrdersScreen> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
-                                  Text("Name :"+orders[index]["order"][i]["name"],
-                                      style: TextStyle(color: Colors.black)),
-                                  Text("Quantity :"+orders[index]["order"][i]["quantity"].toString(),
-                                      style: TextStyle(color: Colors.black)),
+                                  Text("Nombre :"+orders[index]["order"][i]["name"],
+                                      style: TextStyle(color: Colors.red)),
+                                  Text("Cantidad :"+orders[index]["order"][i]["quantity"].toString(),
+                                      style: TextStyle(color: Colors.blue)),
                                 ],
                               ),
                             ],
@@ -116,37 +112,33 @@ class _AcceptedOrdersScreenState extends State<AcceptedOrdersScreen> {
                       ),
                     ),
                     Text("UserId:"+orders[index]["userId"],
-                        style: TextStyle(color: Colors.black,)),
-                    Text("PaymentMode:"+orders[index]["paymentMode"],
+                        style: TextStyle(color: Colors.green,)),
+                    Text("Modo de pago:"+orders[index]["paymentMode"],
                         style: TextStyle(color: Colors.black)),
                     Text("Total:"+orders[index]["total"].toString(),
-                        style: TextStyle(color: Colors.black)),
+                        style: TextStyle(color: Colors.red)),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Container(
-                          padding: EdgeInsets.fromLTRB(5,5,10,5),
-                          width: 150.0,
-                          height: 50.0,
-                          child: FlatButton(
-                            color: Colors.green,
-                            child: Text(
-                              "Order Processed".toUpperCase(),
-                              style: TextStyle(
-                                color: Colors.white,
-                              ),
+                        FlatButton(
+                          color: Colors.green,
+                          child: Text(
+                            "Confirmar pedido procesado".toUpperCase(),//Confirm Order Processed
+                            style: TextStyle(
+                              color: Colors.white,
                             ),
-                            onPressed: ()async{
-                              DocumentReference documentReference = FirebaseFirestore.instance.collection('orders').doc(orders[index]["orderId"]);
-                              await documentReference.update({
-                                "status":"processed",
-                              });
-                              orders = [];
-                              fetchOrders();
-                              setState(() {
-
-                              });
-                            },
                           ),
+                          onPressed: ()async{
+                            DocumentReference documentReference = FirebaseFirestore.instance.collection('orders').doc(orders[index]["orderId"]);
+                            await documentReference.update({
+                              "status":"processed",
+                            });
+                            orders = [];
+                            fetchOrders();
+                            setState(() {
+
+                            });
+                          },
                         ),
                         // Container(
                         //   padding: EdgeInsets.fromLTRB(5,5,10,5),
@@ -168,7 +160,9 @@ class _AcceptedOrdersScreenState extends State<AcceptedOrdersScreen> {
                     ),
                   ],
                 ),
-              ));
+              ),
+            ),
+          );
         },
       ),
     );

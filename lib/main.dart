@@ -52,7 +52,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
         automaticallyImplyLeading: false,
         centerTitle: true,
         title: Text(
-          "Employee Login",
+          "Inicio de sesión de empleado",// Employee Login
         ),
         elevation: 0.0,
         actions: <Widget>[
@@ -70,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
                 top: 25.0,
               ),
               child: Text(
-                "Log in to your account",
+                "Ingrese a su cuenta",//Log in to your account
                 style: TextStyle(
                   fontSize: 18.0,
                   fontWeight: FontWeight.w700,
@@ -221,7 +221,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
 alertDialogUserDoesNotExist(BuildContext context) {
   // This is the ok button
   Widget ok = FlatButton(
-    child: Text("Retry"),
+    child: Text("Rever"),
     onPressed: () {
       Navigator.of(context).pop();
     },
@@ -232,7 +232,7 @@ alertDialogUserDoesNotExist(BuildContext context) {
     builder: (BuildContext context) {
       return AlertDialog(
         title: Text("Error"),
-        content: Text("Invalid Login Please Register!!"),
+        content: Text("Inicio de sesión no válido ¡Regístrese!"),//Invalid Login Please Register!!
         actions: [
           ok,
         ],
@@ -244,7 +244,7 @@ alertDialogUserDoesNotExist(BuildContext context) {
 alertDialogWrongPassword(BuildContext context) {
   // This is the ok button
   Widget ok = FlatButton(
-    child: Text("Retry"),
+    child: Text("Rever"),
     onPressed: () {
       Navigator.of(context).pop();
     },
@@ -255,7 +255,7 @@ alertDialogWrongPassword(BuildContext context) {
     builder: (BuildContext context) {
       return AlertDialog(
         title: Text("Error"),
-        content: Text("Incorrect Password"),
+        content: Text("Contraseña incorrecta"),//Incorrect Password
         actions: [
           ok,
         ],

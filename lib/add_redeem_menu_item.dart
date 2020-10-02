@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -24,11 +25,14 @@ class _AddRedeemMenuItemState extends State<AddRedeemMenuItem> {
   final FirebaseStorage _storage =
   FirebaseStorage(storageBucket: 'gs://restaurantapp-65d0e.appspot.com');
   StorageUploadTask _uploadTask;
+  bool isLoading;
 
   @override
   void initState() {
+    isLoading=false;
     // TODO: implement initState
     super.initState();
+
   }
   _imgFromCamera() async {
     File image = await ImagePicker.pickImage(
@@ -59,14 +63,14 @@ class _AddRedeemMenuItemState extends State<AddRedeemMenuItem> {
                 children: <Widget>[
                   new ListTile(
                       leading: new Icon(Icons.photo_library),
-                      title: new Text('Photo Library'),
+                      title: new Text('Librería fotográfica'),
                       onTap: () {
                         _imgFromGallery();
                         Navigator.of(context).pop();
                       }),
                   new ListTile(
                     leading: new Icon(Icons.photo_camera),
-                    title: new Text('Camera'),
+                    title: new Text('Cámara'),
                     onTap: () {
                       _imgFromCamera();
                       Navigator.of(context).pop();
@@ -109,12 +113,19 @@ class _AddRedeemMenuItemState extends State<AddRedeemMenuItem> {
           ),
           centerTitle: true,
           title: Text(
-            "Add RedeemMenu Item",
+            "Agregar elemento de menú canjear",// Add Redeem Menu Item
           ),
           elevation: 0.0,
           actions: <Widget>[],
         ),
-        body: SingleChildScrollView(
+        body: isLoading
+            ? Center(
+          child: CircularProgressIndicator(
+            backgroundColor: Colors.cyan,
+            strokeWidth: 5,
+          ),
+        )
+            : SingleChildScrollView(
           child: Column(
             children: <Widget>[
               Card(
@@ -127,6 +138,7 @@ class _AddRedeemMenuItemState extends State<AddRedeemMenuItem> {
                     ),
                   ),
                   child: TextField(
+                    keyboardType: TextInputType.text,
                     style: TextStyle(
                       fontSize: 15.0,
                       color: Colors.black,
@@ -145,7 +157,7 @@ class _AddRedeemMenuItemState extends State<AddRedeemMenuItem> {
                         ),
                         borderRadius: BorderRadius.circular(5.0),
                       ),
-                      hintText: "Item Name",
+                      hintText: "Nombre del árticulo",// Item Name
                       hintStyle: TextStyle(
                         fontSize: 15.0,
                         color: Colors.black,
@@ -171,6 +183,7 @@ class _AddRedeemMenuItemState extends State<AddRedeemMenuItem> {
                     ),
                   ),
                   child: TextField(
+                    keyboardType: TextInputType.number,
                     style: TextStyle(
                       fontSize: 15.0,
                       color: Colors.black,
@@ -189,7 +202,7 @@ class _AddRedeemMenuItemState extends State<AddRedeemMenuItem> {
                         ),
                         borderRadius: BorderRadius.circular(5.0),
                       ),
-                      hintText: "Item Points",
+                      hintText: "Puntos de artículo",//Item Points
                       hintStyle: TextStyle(
                         fontSize: 15.0,
                         color: Colors.black,
@@ -238,7 +251,7 @@ class _AddRedeemMenuItemState extends State<AddRedeemMenuItem> {
                 ),
               ),
               Text(
-                "Enter Item Description",
+                "Ingrese la descripción del artículo",//Enter Item Description
                 style: TextStyle(
                   fontSize: 23,
                   fontWeight: FontWeight.w800,
@@ -256,6 +269,7 @@ class _AddRedeemMenuItemState extends State<AddRedeemMenuItem> {
                     ),
                   ),
                   child: TextField(
+                    keyboardType: TextInputType.text,
                     style: TextStyle(
                       fontSize: 15.0,
                       color: Colors.black,
@@ -274,7 +288,7 @@ class _AddRedeemMenuItemState extends State<AddRedeemMenuItem> {
                         ),
                         borderRadius: BorderRadius.circular(5.0),
                       ),
-                      hintText: "Enter Description",
+                      hintText: "Ingrese descripción",//Enter Description
                       hintStyle: TextStyle(
                         fontSize: 15.0,
                         color: Colors.black,
@@ -288,7 +302,7 @@ class _AddRedeemMenuItemState extends State<AddRedeemMenuItem> {
               ),
               FlatButton(
                 child: Text(
-                  "Save ",
+                  "Salvar ",
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
@@ -296,8 +310,13 @@ class _AddRedeemMenuItemState extends State<AddRedeemMenuItem> {
                   ),
                 ),
                 onPressed: () async{
+                  isLoading=true;
+                  setState(() {
+
+                  });
                   await uploadMenuItemToFirebase();
-                  await alertDialogUploadFinished(context);
+                  // await alertDialogUploadFinished(context);
+                  isLoading=false;
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (BuildContext context){
@@ -325,8 +344,8 @@ alertDialogUploadFinished(BuildContext context) async{
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text("Upload Finished"),
-        content: Text("Menu Uploaded to Firebase"),
+        title: Text("Subida finalizada"),//Upload Finished
+        content: Text("Menú subido a Firebase"),//Menu Uploaded to Firebase
         actions: [
           ok,
         ],

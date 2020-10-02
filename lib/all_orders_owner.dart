@@ -92,7 +92,7 @@ class _AllOrdersOwnerScreenState extends State<AllOrdersOwnerScreen> {
         ),
         centerTitle: true,
         title: Text(
-          "ALL ORDERS",
+          "Historial de pedidos",//ORDER history
         ),
         elevation: 0.0,
         actions: <Widget>[
@@ -111,51 +111,48 @@ class _AllOrdersOwnerScreenState extends State<AllOrdersOwnerScreen> {
         itemBuilder: (context, index) {
           return Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Container(
-                margin: const EdgeInsets.all(10.0),
-                padding: const EdgeInsets.all(10.0),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.red, //                   <--- border color
-                    width: 5.0,
-                  ),
-                ),
-                child: Column(
-                  children: <Widget>[
-                    Text("Restaurant Name:"+restaurantMap[orders[index]["restaurantId"]],
-                        style: TextStyle(color: Colors.black)),
-                    Column(
-                      children: List.generate(orders[index]["order"].length, (i) {
-                        return Container(
-                          child: Column(
-                            children: <Widget>[
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Text("Name :"+orders[index]["order"][i]["name"],
-                                      style: TextStyle(color: Colors.black)),
-                                  Text("Quantity :"+orders[index]["order"][i]["quantity"].toString(),
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ],
-                          ),
-                        );
-                      }
+              child: Card(
+                color: Colors.blue[100],
+                shadowColor: Colors.grey,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: <Widget>[
+                      Text("Nombre del restaurante:"+restaurantMap[orders[index]["restaurantId"]],
+                          style: TextStyle(color: Colors.red)),
+                      Column(
+                        children: List.generate(orders[index]["order"].length, (i) {
+                          return Container(
+                            child: Column(
+                              children: <Widget>[
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Text("Nombre :"+orders[index]["order"][i]["name"],
+                                        style: TextStyle(color: Colors.black)),
+                                    Text("Cantidad :"+orders[index]["order"][i]["quantity"].toString(),
+                                        style: TextStyle(color: Colors.black)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                        ),
                       ),
-                    ),
-                    Text("Time:"+orders[index]["timestamp"].toString(),
-                        style: TextStyle(color: Colors.red,)),
-                    Text("UserId:"+orders[index]["userId"],
-                        style: TextStyle(color: Colors.blue,)),
-                    Text("PaymentMode:"+orders[index]["paymentMode"],
-                        style: TextStyle(color: Colors.green)),
-                    Text("Total:"+orders[index]["total"].toString(),
-                        style: TextStyle(color: Colors.black)),
-                    Text("Status:"+orders[index]["status"],
-                        style: TextStyle(color: Colors.black)),
+                      Text("Time:"+orders[index]["timestamp"].toString(),
+                          style: TextStyle(color: Colors.red,)),
+                      Text("UserId:"+orders[index]["userId"],
+                          style: TextStyle(color: Colors.blue,)),
+                      Text("Modo de pago:"+orders[index]["paymentMode"],
+                          style: TextStyle(color: Colors.green)),
+                      Text("Total:"+orders[index]["total"].toString(),
+                          style: TextStyle(color: Colors.black)),
+                      Text("estado:"+orders[index]["status"],
+                          style: TextStyle(color: Colors.black)),
 
-                  ],
+                    ],
+                  ),
                 ),
               ));
         },

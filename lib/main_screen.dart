@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:restaurantsideapp/accepted_orders.dart';
+import 'package:restaurantsideapp/increase_points.dart';
+import 'package:restaurantsideapp/main.dart';
 import 'package:restaurantsideapp/orders_by_restaurant.dart';
 import 'package:restaurantsideapp/all_orders_owner.dart';
 import 'package:restaurantsideapp/delivered_orders.dart';
@@ -13,7 +15,8 @@ import 'package:restaurantsideapp/pending_orders.dart';
 import 'package:restaurantsideapp/redeem_menu.dart';
 
 class MainScreen extends StatefulWidget {
-  MainScreen({Key key}) : super(key: key);
+  final List<String> categories;
+  MainScreen({Key key, @required this.categories}) : super(key: key);
 
   @override
   _MainScreenState createState() => _MainScreenState();
@@ -24,6 +27,7 @@ class _MainScreenState extends State<MainScreen> {
   final firestoreInstance = FirebaseFirestore.instance;
   FirebaseAuth auth = FirebaseAuth.instance;
   String workStatus="";
+  bool isLoading;
 
   getWorkStatus()async{
     var staffRef = FirebaseFirestore.instance.collection("staff");
@@ -31,15 +35,20 @@ class _MainScreenState extends State<MainScreen> {
     var docSnapShotList = query.docs;
     workStatus = docSnapShotList[0].get("status");
     print(workStatus);
+    isLoading=false;
     setState(() {
 
     });
   }
   @override
   void initState() {
+    isLoading=true;
     // TODO: implement initState
     super.initState();
     getWorkStatus();
+  }
+  signOut() async {
+    await auth.signOut();
   }
   @override
   Widget build(BuildContext context) {
@@ -48,119 +57,69 @@ class _MainScreenState extends State<MainScreen> {
         automaticallyImplyLeading: false,
         centerTitle: true,
         title: Text(
-          "ORDERS PAGE",
+          "Página de pedidos",//ORDERS PAGE
         ),
         elevation: 0.0,
-        actions: <Widget>[],
+        actions: <Widget>[
+          FlatButton.icon(
+            color: Colors.blue,
+            label: Text('Cerrar sesión'),//LogOut
+            icon: Icon(Icons.power_settings_new),
+            onPressed: (){
+              signOut();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (BuildContext context){
+                    return MyHomePage();
+                  },
+                ),
+              );
+            },
+          )
+        ],
       ),
-      body: Center(
+      body: isLoading
+          ? Center(
+        child: CircularProgressIndicator(
+          backgroundColor: Colors.cyan,
+          strokeWidth: 5,
+        ),
+      )
+          : Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(
         child: Column(
-          children: <Widget>[
-            if(workStatus=="manager" || workStatus=="worker")
-            Container(
-              padding: EdgeInsets.fromLTRB(5,5,10,5),
-              width: 150.0,
-              height: 50.0,
-              child: FlatButton(
-                color: Colors.red,
-                child: Text(
-                  "PENDING ORDERS".toUpperCase(),
-                  style: TextStyle(
-                    color: Colors.white,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              if(workStatus=="manager" || workStatus=="worker")
+                SizedBox(
+                  width: double.infinity,
+                  child: FlatButton(
+                    color: Colors.red,
+                    child: Text(
+                      "Ordenes pendientes".toUpperCase(),//PENDING ORDERS
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    onPressed: (){
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (BuildContext context){
+                            return PendingOrdersScreen();
+                          },
+                        ),
+                      );
+                    },
                   ),
                 ),
-                onPressed: (){
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (BuildContext context){
-                        return PendingOrdersScreen();
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
-            if(workStatus=="manager" || workStatus=="worker")
-            Container(
-              padding: EdgeInsets.fromLTRB(5,5,10,5),
-              width: 150.0,
-              height: 50.0,
-              child: FlatButton(
-                color: Colors.green,
-                child: Text(
-                  "ACCEPTED ORDERS".toUpperCase(),
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-                onPressed: (){
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (BuildContext context){
-                        return AcceptedOrdersScreen();
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
-            if(workStatus=="manager" || workStatus=="worker")
-            Container(
-              padding: EdgeInsets.fromLTRB(5,5,10,5),
-              width: 150.0,
-              height: 50.0,
-              child: FlatButton(
-                color: Colors.yellow,
-                child: Text(
-                  "OUT FOR DELIVERY".toUpperCase(),
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-                onPressed: (){
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (BuildContext context){
-                        return OutForDeliveryScreen();
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
-            if(workStatus=="manager" || workStatus=="worker")
-            Container(
-              padding: EdgeInsets.fromLTRB(5,5,10,5),
-              width: 150.0,
-              height: 50.0,
-              child: FlatButton(
-                color: Colors.blue,
-                child: Text(
-                  "DELIVERED".toUpperCase(),
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-                onPressed: (){
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (BuildContext context){
-                        return DeliveredOrdersScreen();
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
-            if(workStatus=="manager" || workStatus=="owner")
-              Container(
-                padding: EdgeInsets.fromLTRB(5,5,10,5),
-                width: 150.0,
-                height: 50.0,
+              if(workStatus=="manager" || workStatus=="worker")
+              SizedBox(
+                width: double.infinity,
                 child: FlatButton(
-                  color: Colors.red,
+                  color: Colors.green,
                   child: Text(
-                    "View/Change Menu".toUpperCase(),
+                    "PEDIDOS ACEPTADOS".toUpperCase(),//ACCEPTED ORDERS
                     style: TextStyle(
                       color: Colors.white,
                     ),
@@ -169,22 +128,20 @@ class _MainScreenState extends State<MainScreen> {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (BuildContext context){
-                          return MenuScreen();
+                          return AcceptedOrdersScreen();
                         },
                       ),
                     );
                   },
                 ),
               ),
-            if(workStatus=="manager" || workStatus=="owner")
-              Container(
-                padding: EdgeInsets.fromLTRB(5,5,10,5),
-                width: 150.0,
-                height: 50.0,
+              if(workStatus=="manager" || workStatus=="worker")
+              SizedBox(
+                width: double.infinity,
                 child: FlatButton(
-                  color: Colors.red,
+                  color: Colors.yellow,
                   child: Text(
-                    "View/Change Redeem Menu".toUpperCase(),
+                    "Fuera para entrega".toUpperCase(),// Out for Delivery
                     style: TextStyle(
                       color: Colors.white,
                     ),
@@ -193,22 +150,20 @@ class _MainScreenState extends State<MainScreen> {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (BuildContext context){
-                          return RedeemMenuScreen();
+                          return OutForDeliveryScreen();
                         },
                       ),
                     );
                   },
                 ),
               ),
-            if(workStatus=="manager")
-              Container(
-                padding: EdgeInsets.fromLTRB(5,5,10,5),
-                width: 150.0,
-                height: 50.0,
+              if(workStatus=="manager" || workStatus=="worker")
+              SizedBox(
+                width: double.infinity,
                 child: FlatButton(
-                  color: Colors.red,
+                  color: Colors.blue,
                   child: Text(
-                    "View Order History".toUpperCase(),
+                    "ENTREGADO".toUpperCase(),//DELIVERED
                     style: TextStyle(
                       color: Colors.white,
                     ),
@@ -217,40 +172,127 @@ class _MainScreenState extends State<MainScreen> {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (BuildContext context){
-                          return OrdersByRestaurantScreen();
+                          return DeliveredOrdersScreen();
                         },
                       ),
                     );
                   },
                 ),
               ),
-            if(workStatus=="owner")
-              Container(
-                padding: EdgeInsets.fromLTRB(5,5,10,5),
-                width: 150.0,
-                height: 50.0,
-                child: FlatButton(
-                  color: Colors.red,
-                  child: Text(
-                    "View Order History".toUpperCase(),
-                    style: TextStyle(
-                      color: Colors.white,
+              if(workStatus=="manager" || workStatus=="owner")
+                SizedBox(
+                  width: double.infinity,
+                  child: FlatButton(
+                    color: Colors.red,
+                    child: Text(
+                      "Menú Ver / Cambiar".toUpperCase(),//View/Change Menu
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
                     ),
+                    onPressed: (){
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (BuildContext context){
+                            return MenuScreen();
+                          },
+                        ),
+                      );
+                    },
                   ),
-                  onPressed: (){
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (BuildContext context){
-                          return AllOrdersOwnerScreen();
-                        },
-                      ),
-                    );
-                  },
                 ),
-              ),
-          ],
+              if(workStatus=="manager" || workStatus=="owner")
+                SizedBox(
+                  width: double.infinity,
+                  child: FlatButton(
+                    color: Colors.red,
+                    child: Text(
+                      "Ver / Cambiar menú de canje".toUpperCase(),//View/Change Redeem Menu
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    onPressed: (){
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (BuildContext context){
+                            return RedeemMenuScreen();
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              if(workStatus=="manager")
+                SizedBox(
+                  width: double.infinity,
+                  child: FlatButton(
+                    color: Colors.red,
+                    child: Text(
+                      "Ver historial de pedidos".toUpperCase(),//View Order History
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    onPressed: (){
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (BuildContext context){
+                            return OrdersByRestaurantScreen();
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              if(workStatus=="owner")
+                SizedBox(
+                  width: double.infinity,
+                  child: FlatButton(
+                    color: Colors.red,
+                    child: Text(
+                      "Ver historial de pedidos".toUpperCase(),// View Order History
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    onPressed: (){
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (BuildContext context){
+                            return AllOrdersOwnerScreen();
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              if(workStatus=="owner")
+                SizedBox(
+                  width: double.infinity,
+                  child: FlatButton(
+                    color: Colors.red,
+                    child: Text(
+                      "Aumentar puntos".toUpperCase(),// Increase Points
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    onPressed: (){
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (BuildContext context){
+                            return IncreasePointsScreen();
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+            ],
         ),
       ),
+          ),
     );
   }
 }

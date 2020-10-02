@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -28,10 +29,12 @@ class _AddMenuItemState extends State<AddMenuItem> {
   final FirebaseStorage _storage =
   FirebaseStorage(storageBucket: 'gs://restaurantapp-65d0e.appspot.com');
   StorageUploadTask _uploadTask;
+  bool isLoading;
 
   @override
   void initState() {
     // TODO: implement initState
+    isLoading=false;
     super.initState();
     categories = widget.categories;
     if(!categories.contains("Add New Category")){
@@ -68,14 +71,14 @@ class _AddMenuItemState extends State<AddMenuItem> {
                 children: <Widget>[
                   new ListTile(
                       leading: new Icon(Icons.photo_library),
-                      title: new Text('Photo Library'),
+                      title: new Text('Librería fotográfica'),
                       onTap: () {
                         _imgFromGallery();
                         Navigator.of(context).pop();
                       }),
                   new ListTile(
                     leading: new Icon(Icons.photo_camera),
-                    title: new Text('Camera'),
+                    title: new Text('Cámara'),
                     onTap: () {
                       _imgFromCamera();
                       Navigator.of(context).pop();
@@ -118,12 +121,19 @@ class _AddMenuItemState extends State<AddMenuItem> {
           ),
           centerTitle: true,
           title: Text(
-            "Add Menu Item",
+            "Agregar elemento de menú",// Add Menu Item
           ),
           elevation: 0.0,
           actions: <Widget>[],
         ),
-        body: SingleChildScrollView(
+        body: isLoading
+            ? Center(
+          child: CircularProgressIndicator(
+            backgroundColor: Colors.cyan,
+            strokeWidth: 5,
+          ),
+        )
+            : SingleChildScrollView(
           child: Column(
             children: <Widget>[
               Card(
@@ -136,6 +146,7 @@ class _AddMenuItemState extends State<AddMenuItem> {
                     ),
                   ),
                   child: TextField(
+                    keyboardType: TextInputType.text,
                     style: TextStyle(
                       fontSize: 15.0,
                       color: Colors.black,
@@ -154,7 +165,7 @@ class _AddMenuItemState extends State<AddMenuItem> {
                         ),
                         borderRadius: BorderRadius.circular(5.0),
                       ),
-                      hintText: "Item Name",
+                      hintText: "Nombre del árticulo",//Item Name
                       hintStyle: TextStyle(
                         fontSize: 15.0,
                         color: Colors.black,
@@ -180,6 +191,7 @@ class _AddMenuItemState extends State<AddMenuItem> {
                     ),
                   ),
                   child: TextField(
+                    keyboardType: TextInputType.numberWithOptions(signed: false,decimal: false),
                     style: TextStyle(
                       fontSize: 15.0,
                       color: Colors.black,
@@ -198,15 +210,12 @@ class _AddMenuItemState extends State<AddMenuItem> {
                         ),
                         borderRadius: BorderRadius.circular(5.0),
                       ),
-                      hintText: "Item Price",
+                      hintText: "₲ Precio del articulo",//Item Price
                       hintStyle: TextStyle(
                         fontSize: 15.0,
                         color: Colors.black,
                       ),
-                      prefixIcon: Icon(
-                        Icons.attach_money,
-                        color: Colors.black,
-                      ),
+
                     ),
                     maxLines: 1,
                     controller: _itemPriceController,
@@ -247,14 +256,14 @@ class _AddMenuItemState extends State<AddMenuItem> {
                 ),
               ),
               Text(
-                "Select Category:",
+                "selecciona una categoría:",//Select Category
                 style: TextStyle(
                   fontSize: 23,
                   fontWeight: FontWeight.w800,
                 ),
               ),
               DropdownButton(
-                hint: Text('Please choose a Category'),
+                hint: Text('Por favor elija una categoría'),//Please choose a Category
                 // Not necessary for Option 1
                 value: selectedCategory,
                 onChanged: (newValue) {
@@ -299,7 +308,7 @@ class _AddMenuItemState extends State<AddMenuItem> {
                         ),
                         borderRadius: BorderRadius.circular(5.0),
                       ),
-                      hintText: "Category",
+                      hintText: "Categoría",
                       hintStyle: TextStyle(
                         fontSize: 15.0,
                         color: Colors.black,
@@ -315,7 +324,7 @@ class _AddMenuItemState extends State<AddMenuItem> {
                 ),
               ),
               Text(
-                "Enter Item Description",
+                "Ingrese la descripción del artículo",//Enter Item Description
                 style: TextStyle(
                   fontSize: 23,
                   fontWeight: FontWeight.w800,
@@ -333,7 +342,7 @@ class _AddMenuItemState extends State<AddMenuItem> {
                     ),
                   ),
                   child: TextField(
-
+                    keyboardType: TextInputType.text,
                     style: TextStyle(
                       fontSize: 15.0,
                       color: Colors.black,
@@ -366,7 +375,7 @@ class _AddMenuItemState extends State<AddMenuItem> {
               ),
               FlatButton(
                 child: Text(
-                  "Save ",
+                  "Salvar ",
                   style: TextStyle(
                      fontSize: 22,
                      fontWeight: FontWeight.w800,
@@ -374,8 +383,13 @@ class _AddMenuItemState extends State<AddMenuItem> {
                   ),
                 ),
                 onPressed: () async{
+                  isLoading=true;
+                  setState(() {
+
+                  });
                    await uploadMenuItemToFirebase();
-                    await alertDialogUploadFinished(context);
+                    // await alertDialogUploadFinished(context);
+                    isLoading=false;
                    Navigator.of(context).push(
                      MaterialPageRoute(
                        builder: (BuildContext context){
@@ -403,8 +417,8 @@ alertDialogUploadFinished(BuildContext context) async{
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text("Upload Finished"),
-        content: Text("Menu Uploaded to Firebase"),
+        title: Text("Subida finalizada"),//Upload Finished
+        content: Text("Menú subido a Firebase"),//Menu Uploaded to Firebase
         actions: [
           ok,
         ],

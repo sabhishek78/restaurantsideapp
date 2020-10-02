@@ -72,7 +72,7 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
                 children: <Widget>[
                   new ListTile(
                       leading: new Icon(Icons.photo_library),
-                      title: new Text('Photo Library'),
+                      title: new Text('Librería fotográfica'),//Photo Library
                       onTap: () async{
                         await _imgFromGallery();
                         await uploadPhotoToFirebase();
@@ -83,7 +83,7 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
                       }),
                   new ListTile(
                     leading: new Icon(Icons.photo_camera),
-                    title: new Text('Camera'),
+                    title: new Text('Cámara'),//Camera
                     onTap: () async{
                       await _imgFromCamera();
                       await uploadPhotoToFirebase();
@@ -129,7 +129,7 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
         ),
         centerTitle: true,
         title: Text(
-          "Item Details",
+          "detalles del artículo",//Item Details
         ),
         elevation: 0.0,
         actions: <Widget>[
@@ -236,7 +236,7 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
             Row(
               children: <Widget>[
                 Text(
-                  "Product Description",
+                  "Descripción del producto",//Product Description
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
@@ -277,7 +277,7 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
           height: 50.0,
           child: RaisedButton(
             child: Text(
-              "DELETE ITEM FROM DATABASE",
+              "BORRAR ELEMENTO DE LA BASE DE DATOS",//DELETE ITEM FROM DATABASE
               style: TextStyle(
                 color: Colors.white,
               ),
@@ -302,24 +302,24 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Edit Dish Description'),
+            title: Text('Editar descripción del plato'),//Edit Dish Description
             content: TextField(
               maxLines: 5,
               controller: _textFieldController,
               textInputAction: TextInputAction.go,
               keyboardType: TextInputType.text,
               textCapitalization: TextCapitalization.words,
-              decoration: InputDecoration(hintText: "Enter New Description"),
+              decoration: InputDecoration(hintText: "Ingrese nueva descripción"),
             ),
             actions: <Widget>[
               new FlatButton(
-                child: new Text('Cancel'),
+                child: new Text('Cancelar'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               new FlatButton(
-                child: new Text('Submit'),
+                child: new Text('Enviar'),
                 onPressed: () async{
                   print("Updating Dish Description");
                   var menuRef = FirebaseFirestore.instance.collection("redeemMenu");
@@ -346,23 +346,23 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Edit Dish Points'),
+            title: Text('Editar puntos de plato'),//Edit Dish Points
             content: TextField(
               controller: _textFieldController,
               textInputAction: TextInputAction.go,
               keyboardType: TextInputType.text,
               textCapitalization: TextCapitalization.words,
-              decoration: InputDecoration(hintText: "Enter New Dish Points"),
+              decoration: InputDecoration(hintText: "Ingrese nuevos puntos de plato"),
             ),
             actions: <Widget>[
               new FlatButton(
-                child: new Text('Cancel'),
+                child: new Text('Cancelar'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               new FlatButton(
-                child: new Text('Submit'),
+                child: new Text('Enviar'),
                 onPressed: () async{
                   print("Updating Dish Points");
                   var menuRef = FirebaseFirestore.instance.collection("redeemMenu");
@@ -389,10 +389,10 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Delete Item from Database?'),
+            title: Text('¿Eliminar elemento de la base de datos?'),//Delete Item from Database?
             actions: <Widget>[
               new FlatButton(
-                child: new Text('Cancel'),
+                child: new Text('Cancelar'),
                 onPressed: () async{
                   Navigator.of(context).pop();
                 },

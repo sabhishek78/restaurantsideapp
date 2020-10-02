@@ -2,10 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:restaurantsideapp/add_menu_item.dart';
 import 'package:restaurantsideapp/grid_product.dart';
+import 'package:restaurantsideapp/main_screen.dart';
 
 
 class MenuScreen extends StatefulWidget {
-
   MenuScreen({Key key}) : super(key: key);
   @override
   _MenuScreenState createState() => _MenuScreenState();
@@ -13,12 +13,11 @@ class MenuScreen extends StatefulWidget {
 
 class _MenuScreenState extends State<MenuScreen> {
   final firestoreInstance = FirebaseFirestore.instance;
-
   List<Map> foods = [];
-
   List<String> categories = [];
   bool isLoading = true;
   getMenu() {
+    foods=[];
     firestoreInstance.collection("menu").get().then((querySnapshot) {
         querySnapshot.docs.forEach((result) {
           // print(result.data());
@@ -66,11 +65,19 @@ class _MenuScreenState extends State<MenuScreen> {
           icon: Icon(
             Icons.keyboard_backspace,
           ),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (BuildContext context){
+                  return MainScreen(categories:categories);
+                },
+              ),
+            );
+          },
         ),
         centerTitle: true,
         title: Text(
-          "Menu Items",
+          "Elementos de menú",//Menu Items
         ),
         elevation: 0.0,
         actions: <Widget>[
@@ -99,7 +106,7 @@ class _MenuScreenState extends State<MenuScreen> {
             ),
           );
         },
-        label: Text('Add New Item'),
+        label: Text('Agregar ítem nuevo'),//Add New Item
         icon: Icon(Icons.add),
         backgroundColor: Colors.pink,
       ),
@@ -137,6 +144,7 @@ class _MenuScreenState extends State<MenuScreen> {
             Map food = temp[index];
             // print(food);
             return GridProduct(
+              categories:categories,
               updateMenuScreenState:updateMenuScreenState,
               food:food,
               img: food['image'],

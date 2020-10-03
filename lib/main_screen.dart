@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:restaurantsideapp/accepted_orders.dart';
+import 'package:restaurantsideapp/change_delivery_charge.dart';
 import 'package:restaurantsideapp/increase_points.dart';
 import 'package:restaurantsideapp/main.dart';
 import 'package:restaurantsideapp/orders_by_restaurant.dart';
@@ -217,6 +218,28 @@ class _MainScreenState extends State<MainScreen> {
                         MaterialPageRoute(
                           builder: (BuildContext context){
                             return RedeemMenuScreen();
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              if(workStatus=="manager")
+                SizedBox(
+                  width: double.infinity,
+                  child: FlatButton(
+                    color: Colors.red,
+                    child: Text(
+                      "cambiar gastos de envío".toUpperCase(),//Change delivery Charge
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    onPressed: (){
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (BuildContext context){
+                            return ChangeDeliveryChargeScreen();
                           },
                         ),
                       );

@@ -18,8 +18,6 @@ class _AddRedeemMenuItemState extends State<AddRedeemMenuItem> {
   final TextEditingController _itemNameController = new TextEditingController();
   final TextEditingController _itemPointsController =
   new TextEditingController();
-  final TextEditingController _categoryController =
-  new TextEditingController();
   final TextEditingController _itemDescriptionController = new TextEditingController();
   File _image;
   final FirebaseStorage _storage =
@@ -90,13 +88,12 @@ class _AddRedeemMenuItemState extends State<AddRedeemMenuItem> {
     String docUrl = await (await _uploadTask.onComplete).ref.getDownloadURL();
     DocumentReference documentReference = FirebaseFirestore.instance.collection('redeemMenu').doc(_itemNameController.text);
     await documentReference.set({
-      "category": _categoryController.text,
       "description": _itemDescriptionController.text,
       "image": docUrl,
       "name":_itemNameController.text,
       "price":0,
       "points":int.parse(_itemPointsController.text),
-      "redeem":false,
+      "redeem":true,
     });
 
   }

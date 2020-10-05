@@ -38,12 +38,9 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
   final firestoreInstance = FirebaseFirestore.instance;
   FirebaseAuth auth = FirebaseAuth.instance;
   final TextEditingController _passwordController = new TextEditingController();
-
   @override
   void initState() {
     super.initState();
-
-
   }
   @override
   Widget build(BuildContext context) {

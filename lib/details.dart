@@ -29,8 +29,18 @@ class _ProductDetailsState extends State<ProductDetails> {
   new TextEditingController();
 
   deleteItemFromDatabase()async{
-    DocumentReference documentReference = FirebaseFirestore.instance.collection('menu').doc(widget.foodItem["name"]);
+    print("food item id");
+    print(widget.foodItem["id"]);
+    DocumentReference documentReference = FirebaseFirestore.instance.collection('menu').doc(widget.foodItem["id"]);
     await documentReference.delete();
+    widget.updateMenuScreenState();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context){
+          return MenuScreen();
+        },
+      ),
+    );
     print("item deleted from database");
   }
   uploadPhotoToFirebase()async{
@@ -40,7 +50,7 @@ class _ProductDetailsState extends State<ProductDetails> {
     _uploadTask = _storage.ref().child(fileName).putFile(_image);
     String docUrl = await (await _uploadTask.onComplete).ref.getDownloadURL();
     var menuRef = FirebaseFirestore.instance.collection("menu");
-    var query = await menuRef.where("name", isEqualTo: widget.foodItem['name']).get();
+    var query = await menuRef.where("id", isEqualTo: widget.foodItem['id']).get();
     var docSnapShotList = query.docs;
      var docName=docSnapShotList[0].id;
      print("Document Name="+docName);
@@ -109,7 +119,7 @@ class _ProductDetailsState extends State<ProductDetails> {
   getFoodItemDetails()async{
     print("fetching food item details from Firebase");
     var menuRef = FirebaseFirestore.instance.collection("menu");
-    var query = await menuRef.where("name", isEqualTo: widget.foodItem['name']).get();
+    var query = await menuRef.where("id", isEqualTo: widget.foodItem['id']).get();
     var docSnapShotList =query.docs;
     foodItem=docSnapShotList[0].data();
     print(foodItem);
@@ -198,18 +208,34 @@ class _ProductDetailsState extends State<ProductDetails> {
             ),
 
             SizedBox(height: 10.0),
-
-            Row(
-              children: <Widget>[
-                Text(
-                  foodItem["name"],
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
+            Padding(
+              padding: EdgeInsets.only(bottom: 5.0, top: 2.0),
+              child: Row(
+                children: <Widget>[
+                  Text(
+                    foodItem["name"],
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w900,
+                      color: Theme.of(context).accentColor,
+                    ),
                   ),
-                  maxLines: 2,
-                ),
-              ],
+                  IconButton(
+                    icon: Icon(
+                      Icons.edit,
+                      size: 20.0,
+                    ),
+                    onPressed: ()async {
+                      await alertDialogEditDishName(context);
+                      await widget.updateMenuScreenState();
+                      await getFoodItemDetails();
+
+                    },
+                    tooltip: "Edit",
+                  )
+
+                ],
+              ),
             ),
             Padding(
               padding: EdgeInsets.only(bottom: 5.0, top: 2.0),
@@ -322,7 +348,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                 onPressed: () async{
                   print("Updating Dish Category");
                   var menuRef = FirebaseFirestore.instance.collection("menu");
-                  var query = await menuRef.where("name", isEqualTo: foodItem['name']).get();
+                  var query = await menuRef.where("id", isEqualTo: foodItem['id']).get();
                   var docSnapShotList = query.docs;
                   var docName=docSnapShotList[0].id;
                   print("Document Name="+docName);
@@ -421,7 +447,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                 onPressed: () async{
                   print("Updating Dish Description");
                   var menuRef = FirebaseFirestore.instance.collection("menu");
-                  var query = await menuRef.where("name", isEqualTo: foodItem['name']).get();
+                  var query = await menuRef.where("id", isEqualTo: foodItem['id']).get();
                   var docSnapShotList = query.docs;
                   var docName=docSnapShotList[0].id;
                   print("Document Name="+docName);
@@ -464,7 +490,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                 onPressed: () async{
                   print("Updating Dish Price");//
                   var menuRef = FirebaseFirestore.instance.collection("menu");
-                  var query = await menuRef.where("name", isEqualTo: foodItem['name']).get();
+                  var query = await menuRef.where("id", isEqualTo: foodItem['id']).get();
                   var docSnapShotList = query.docs;
                   var docName=docSnapShotList[0].id;
                   print("Document Name="+docName);
@@ -481,7 +507,49 @@ class _ProductDetailsState extends State<ProductDetails> {
           );
         });
   }
+  alertDialogEditDishName(BuildContext context) async {
+    TextEditingController _textFieldController = TextEditingController();
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Edit Dish Name'),//Edit Dish Name
+            content: TextField(
+              controller: _textFieldController,
+              textInputAction: TextInputAction.go,
+              keyboardType: TextInputType.text,
+              textCapitalization: TextCapitalization.words,
+              decoration: InputDecoration(hintText: "Enter New Dish Name"),//Enter New Dish Price
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text('Cancelar'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              new FlatButton(
+                child: new Text('Enviar'),
+                onPressed: () async{
+                  print("Updating Dish Name");//
+                  var menuRef = FirebaseFirestore.instance.collection("menu");
+                  var query = await menuRef.where("id", isEqualTo: foodItem['id']).get();
+                  var docSnapShotList = query.docs;
+                  var docName=docSnapShotList[0].id;
+                  print("Document Name="+docName);
+                  await menuRef.doc(docName).update({"name":int.parse(_textFieldController.text)});
+                  Navigator.of(context).pop();
+                  setState(() {
 
+                  });
+                  print("Dish Name Updated");
+
+                },
+              )
+            ],
+          );
+        });
+  }
   alertDialogConfirmDelete(BuildContext context) async {
     return showDialog(
         context: context,
@@ -499,13 +567,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                 child: new Text('Yes'),
                 onPressed: () async{
                   await deleteItemFromDatabase();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (BuildContext context){
-                        return MenuScreen();
-                      },
-                    ),
-                  );
+
                   },
               ),
             ],

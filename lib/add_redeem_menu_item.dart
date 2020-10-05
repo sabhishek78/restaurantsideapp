@@ -81,13 +81,14 @@ class _AddRedeemMenuItemState extends State<AddRedeemMenuItem> {
         }
     );
   }
-  uploadMenuItemToFirebase()async{
+  uploadRedeemMenuItemToFirebase()async{
     String fileName = _itemNameController.text;
     fileName = fileName.trim();
     _uploadTask = _storage.ref().child(fileName).putFile(_image);
     String docUrl = await (await _uploadTask.onComplete).ref.getDownloadURL();
-    DocumentReference documentReference = FirebaseFirestore.instance.collection('redeemMenu').doc(_itemNameController.text);
+    DocumentReference documentReference = FirebaseFirestore.instance.collection('redeemMenu').doc();
     await documentReference.set({
+      "id":documentReference.id,
       "description": _itemDescriptionController.text,
       "image": docUrl,
       "name":_itemNameController.text,
@@ -311,7 +312,7 @@ class _AddRedeemMenuItemState extends State<AddRedeemMenuItem> {
                   setState(() {
 
                   });
-                  await uploadMenuItemToFirebase();
+                  await uploadRedeemMenuItemToFirebase();
                   // await alertDialogUploadFinished(context);
                   isLoading=false;
                   Navigator.of(context).push(

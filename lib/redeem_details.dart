@@ -25,8 +25,16 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
   bool isLoading=true;
 
   deleteItemFromDatabase()async{
-    DocumentReference documentReference = FirebaseFirestore.instance.collection('redeemMenu').doc(widget.foodItem["name"]);
+    DocumentReference documentReference = FirebaseFirestore.instance.collection('redeemMenu').doc(widget.foodItem["id"]);
     await documentReference.delete();
+    widget.updateRedeemMenuScreenState();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context){
+          return MenuScreen();
+        },
+      ),
+    );
     print("item deleted from database");
   }
   uploadPhotoToFirebase()async{
@@ -36,7 +44,7 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
     _uploadTask = _storage.ref().child(fileName).putFile(_image);
     String docUrl = await (await _uploadTask.onComplete).ref.getDownloadURL();
     var menuRef = FirebaseFirestore.instance.collection("redeemMenu");
-    var query = await menuRef.where("name", isEqualTo: foodItem['name']).get();
+    var query = await menuRef.where("id", isEqualTo: foodItem['id']).get();
     var docSnapShotList = query.docs;
     var docName=docSnapShotList[0].id;
     print("Document Name="+docName);
@@ -103,7 +111,7 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
   getFoodItemDetails()async{
     print("fetching food item details from Firebase");
     var menuRef = FirebaseFirestore.instance.collection("redeemMenu");
-    var query = await menuRef.where("name", isEqualTo: widget.foodItem['name']).get();
+    var query = await menuRef.where("id", isEqualTo: widget.foodItem['id']).get();
     var docSnapShotList =query.docs;
     foodItem=docSnapShotList[0].data();
     print(foodItem);
@@ -184,18 +192,37 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
             ),
 
             SizedBox(height: 10.0),
-
-            Row(
-              children: <Widget>[
-                Text(
-                  foodItem["name"],
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
+            Padding(
+              padding: EdgeInsets.only(bottom: 5.0, top: 2.0),
+              child: Row(
+                children: <Widget>[
+                  Text(
+                    foodItem["name"],
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w900,
+                      color: Theme.of(context).accentColor,
+                    ),
                   ),
-                  maxLines: 2,
-                ),
-              ],
+                  IconButton(
+                    icon: Icon(
+                      Icons.edit,
+                      size: 20.0,
+                    ),
+                    onPressed: ()async {
+                      await alertDialogEditDishName(context);
+                      widget.updateRedeemMenuScreenState();
+                      getFoodItemDetails();
+
+                      // setState(() {
+                      //
+                      // });
+                    },
+                    tooltip: "Edit",
+                  )
+
+                ],
+              ),
             ),
             Padding(
               padding: EdgeInsets.only(bottom: 5.0, top: 2.0),
@@ -323,7 +350,7 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
                 onPressed: () async{
                   print("Updating Dish Description");
                   var menuRef = FirebaseFirestore.instance.collection("redeemMenu");
-                  var query = await menuRef.where("name", isEqualTo:foodItem['name']).get();
+                  var query = await menuRef.where("id", isEqualTo:foodItem['id']).get();
                   var docSnapShotList = query.docs;
                   var docName=docSnapShotList[0].id;
                   print("Document Name="+docName);
@@ -333,6 +360,50 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
 
                   });
                   print("Dish Description Updated");
+
+                },
+              )
+            ],
+          );
+        });
+  }
+  alertDialogEditDishName(BuildContext context) async {
+    TextEditingController _textFieldController = TextEditingController();
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Edit Dish Name'),//Edit Dish Points
+            content: TextField(
+              controller: _textFieldController,
+              textInputAction: TextInputAction.go,
+              keyboardType: TextInputType.text,
+              textCapitalization: TextCapitalization.words,
+              decoration: InputDecoration(hintText: "Ingrese nuevos puntos de plato"),
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text('Cancelar'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              new FlatButton(
+                child: new Text('Enviar'),
+                onPressed: () async{
+                  print("Updating Dish Name");
+                  var menuRef = FirebaseFirestore.instance.collection("redeemMenu");
+                  var query = await menuRef.where("id", isEqualTo: foodItem['id']).get();
+                  var docSnapShotList = query.docs;
+                  var docName=docSnapShotList[0].id;
+                  print("Document Name="+docName);
+                  await menuRef.doc(docName).update({"name":int.parse(_textFieldController.text)});
+                  Navigator.of(context).pop();
+
+                  setState(() {
+
+                  });
+                  print("Dish Name Updated");
 
                 },
               )
@@ -366,7 +437,7 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
                 onPressed: () async{
                   print("Updating Dish Points");
                   var menuRef = FirebaseFirestore.instance.collection("redeemMenu");
-                  var query = await menuRef.where("name", isEqualTo: foodItem['name']).get();
+                  var query = await menuRef.where("id", isEqualTo: foodItem['id']).get();
                   var docSnapShotList = query.docs;
                   var docName=docSnapShotList[0].id;
                   print("Document Name="+docName);

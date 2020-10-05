@@ -96,8 +96,9 @@ class _AddMenuItemState extends State<AddMenuItem> {
      fileName = fileName.trim();
     _uploadTask = _storage.ref().child(fileName).putFile(_image);
     String docUrl = await (await _uploadTask.onComplete).ref.getDownloadURL();
-    DocumentReference documentReference = FirebaseFirestore.instance.collection('menu').doc(_itemNameController.text);
+    DocumentReference documentReference = FirebaseFirestore.instance.collection('menu').doc();
     await documentReference.set({
+      "id":documentReference.id,
       "category": _categoryController.text,
       "description": _itemDescriptionController.text,
       "image": docUrl,

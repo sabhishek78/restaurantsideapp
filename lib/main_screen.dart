@@ -17,7 +17,8 @@ import 'package:restaurantsideapp/redeem_menu.dart';
 
 class MainScreen extends StatefulWidget {
   final List<String> categories;
-  MainScreen({Key key, @required this.categories}) : super(key: key);
+  final String tokenId;
+  MainScreen({Key key, @required this.categories,@required this.tokenId}) : super(key: key);
 
   @override
   _MainScreenState createState() => _MainScreenState();
@@ -34,13 +35,23 @@ class _MainScreenState extends State<MainScreen> {
     var staffRef = FirebaseFirestore.instance.collection("staff");
     var query = await staffRef.where("id", isEqualTo: user.email).get();
     var docSnapShotList = query.docs;
+    print(docSnapShotList[0].id);
     workStatus = docSnapShotList[0].get("status");
     print(workStatus);
+    firestoreInstance
+        .collection("staff")
+        .doc(docSnapShotList[0].id)
+        .update({
+      "token": widget.tokenId,
+    }).then((value) {
+      print("Token uploaded to firebase");
+    });
     isLoading=false;
     setState(() {
 
     });
   }
+
   @override
   void initState() {
     isLoading=true;

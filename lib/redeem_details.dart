@@ -397,9 +397,8 @@ class _RedeemProductDetailsState extends State<RedeemProductDetails> {
                   var docSnapShotList = query.docs;
                   var docName=docSnapShotList[0].id;
                   print("Document Name="+docName);
-                  await menuRef.doc(docName).update({"name":int.parse(_textFieldController.text)});
+                  await menuRef.doc(docName).update({"name":_textFieldController.text});
                   Navigator.of(context).pop();
-
                   setState(() {
 
                   });

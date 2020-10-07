@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:restaurantsideapp/menu.dart';
@@ -93,10 +94,11 @@ class _AddMenuItemState extends State<AddMenuItem> {
   }
   uploadMenuItemToFirebase()async{
     String fileName = _itemNameController.text;
-     fileName = fileName.trim();
-    _uploadTask = _storage.ref().child(fileName).putFile(_image);
+    fileName = fileName.trim();
+     _uploadTask = _storage.ref().child(fileName).putFile(_image);
     String docUrl = await (await _uploadTask.onComplete).ref.getDownloadURL();
     DocumentReference documentReference = FirebaseFirestore.instance.collection('menu').doc();
+
     await documentReference.set({
       "id":documentReference.id,
       "category": _categoryController.text,
@@ -384,21 +386,38 @@ class _AddMenuItemState extends State<AddMenuItem> {
                   ),
                 ),
                 onPressed: () async{
-                  isLoading=true;
-                  setState(() {
+                  if(_image==null){
+                    Fluttertoast.showToast(msg: "Please select Image");//Item Added To Cart
+                  }
+                  else if(_itemNameController.text==""){
+                    Fluttertoast.showToast(msg: "Please enter Name");//Item Added To Cart
+                  }
+                  else if(_itemPriceController.text==""){
+                    Fluttertoast.showToast(msg: "Please enter Price");//Item Added To Cart
+                  }
+                  else if(_itemDescriptionController.text==""){
+                    Fluttertoast.showToast(msg: "Please enter Description");//Item Added To Cart
+                  }
+                  else if(_categoryController.text==""){
+                    Fluttertoast.showToast(msg: "Please select Category");//Item Added To Cart
+                  }
+                  else{
+                    isLoading=true;
+                    setState(() {
 
-                  });
-                   await uploadMenuItemToFirebase();
+                    });
+                    await uploadMenuItemToFirebase();
                     // await alertDialogUploadFinished(context);
                     isLoading=false;
-                   Navigator.of(context).push(
-                     MaterialPageRoute(
-                       builder: (BuildContext context){
-                         return MenuScreen();
-                       },
-                     ),
-                   );
-                },
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (BuildContext context){
+                          return MenuScreen();
+                        },
+                      ),
+                    );
+                  }
+                  },
               ),
             ],
           ),

@@ -44,6 +44,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     if (Platform.isIOS) iOS_Permission();
 
     _firebaseMessaging.getToken().then((token){
+      print("printing token");
       print(token);
       tokenId=token;
 

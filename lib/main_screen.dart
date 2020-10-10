@@ -14,6 +14,7 @@ import 'package:restaurantsideapp/menu.dart';
 import 'package:restaurantsideapp/out_for_delivery.dart';
 import 'package:restaurantsideapp/pending_orders.dart';
 import 'package:restaurantsideapp/redeem_menu.dart';
+import 'package:restaurantsideapp/send_notification.dart';
 
 class MainScreen extends StatefulWidget {
   final List<String> categories;
@@ -317,6 +318,28 @@ class _MainScreenState extends State<MainScreen> {
                         MaterialPageRoute(
                           builder: (BuildContext context){
                             return IncreasePointsScreen();
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              if(workStatus=="owner")
+                SizedBox(
+                  width: double.infinity,
+                  child: FlatButton(
+                    color: Colors.red,
+                    child: Text(
+                      "Send Notification To All Users".toUpperCase(),// Increase Points
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    onPressed: (){
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (BuildContext context){
+                            return SendNotificationScreen();
                           },
                         ),
                       );
